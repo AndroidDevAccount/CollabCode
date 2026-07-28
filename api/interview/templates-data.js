@@ -1,5 +1,6 @@
-(function() {
-  window.InterviewTemplates = {
+'use strict';
+
+module.exports = {
     'csharp-warmup': {
       title: 'C# Very Simple Warm-up',
       language: 'csharp',
@@ -829,5 +830,4 @@ Warning signs:
 - Claims the editor is the problem before reading simple errors.
 - Resume examples cannot be described in practical detail.`
     }
-  };
-})();
+};

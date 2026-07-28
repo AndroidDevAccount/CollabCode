@@ -448,7 +448,7 @@
   }
 
   // Settings sync (simplified)
-  function setupSettingsSync() {
+  async function setupSettingsSync() {
     const settingsRef = sessionRef.child('settings');
     
     // Language selector
@@ -514,6 +514,35 @@
         if (answerKeyButton) answerKeyButton.style.display = 'none';
         closeAnswerKeyPanel();
       } else {
+        try {
+          const response = await fetch('/api/interview/templates', {
+            method: 'GET',
+            headers: Auth.getAuthHeaders()
+          });
+          const data = await response.json();
+
+          if (!response.ok || !data.templates) {
+            throw new Error(data.error || 'Unable to load interview templates');
+          }
+
+          window.InterviewTemplates = data.templates;
+          while (templateSelector.options.length > 1) {
+            templateSelector.remove(1);
+          }
+          Object.entries(data.templates).forEach(([key, template]) => {
+            const option = document.createElement('option');
+            option.value = key;
+            option.textContent = template.title;
+            templateSelector.appendChild(option);
+          });
+          templateSelector.style.display = 'inline-block';
+        } catch (error) {
+          console.error('Failed to load protected interview templates:', error);
+          templateSelector.style.display = 'none';
+          if (answerKeyButton) answerKeyButton.style.display = 'none';
+          return;
+        }
+
         if (answerKeyButton) answerKeyButton.style.display = 'inline-block';
         templateSelector.addEventListener('change', function() {
           const template = window.InterviewTemplates?.[this.value];
