@@ -859,6 +859,39 @@ html, body {
   margin-left: 5px;
 }
 
+#answer-key-btn {
+  padding: 7px 12px;
+  background: #2d6a4f;
+  color: #fff;
+  border: 1px solid #40916c;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#answer-key-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.answer-key-modal-content {
+  width: min(760px, 90vw);
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.answer-key-content {
+  text-align: left;
+  white-space: pre-wrap;
+  background: #171717;
+  color: #eee;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 16px;
+  margin: 14px 0;
+  font: 14px/1.5 Consolas, Monaco, monospace;
+}
+
 #theme-selector {
   min-width: 120px;
 }

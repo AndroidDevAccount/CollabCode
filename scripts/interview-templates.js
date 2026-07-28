@@ -1,377 +1,344 @@
 (function() {
   window.InterviewTemplates = {
     'csharp-warmup': {
+      title: 'C# Very Simple Warm-up',
       language: 'csharp',
-      content: `// C# warm-up — total the valid policy premiums
+      content: `// 5-minute C# warm-up
 //
-// Complete CalculateTotalPremium.
+// Complete AddPositiveNumbers.
+// Add only numbers greater than zero and return the total.
 //
-// Rules:
-// 1. Add each positive premium to the total.
-// 2. Ignore zero and negative values.
-// 3. Return the total.
-//
-// Example:
-// CalculateTotalPremium(new decimal[] { 100m, 50m, -10m, 0m })
-// should return 150m.
+// Example: { 10, -2, 5, 0 } should return 15.
 
 using System;
 
 public class Program
 {
-    public static decimal CalculateTotalPremium(decimal[] premiums)
+    public static int AddPositiveNumbers(int[] numbers)
     {
         // Write your code here.
-        return 0m;
+        return 0;
     }
 
     public static void Main()
     {
-        Console.WriteLine(CalculateTotalPremium(
-            new decimal[] { 100m, 50m, -10m, 0m })); // Expected: 150
-
-        Console.WriteLine(CalculateTotalPremium(
-            new decimal[] { 25.50m, 74.50m }));      // Expected: 100
-
-        Console.WriteLine(CalculateTotalPremium(
-            new decimal[] { -5m, 0m }));             // Expected: 0
+        Console.WriteLine(AddPositiveNumbers(
+            new int[] { 10, -2, 5, 0 })); // Expected: 15
     }
+}`,
+      answerKey: `PLAIN-ENGLISH ANSWER
+Start a total at zero. Loop through every number. If the number is greater
+than zero, add it to the total. Return the total after the loop.
+
+ONE GOOD SOLUTION
+public static int AddPositiveNumbers(int[] numbers)
+{
+    int total = 0;
+    foreach (int number in numbers)
+    {
+        if (number > 0)
+            total += number;
+    }
+    return total;
 }
 
-// If you finish early:
-// - What should the method do if premiums is null?
-// - Can you write the same logic using LINQ?`
+HOW TO GRADE (0–3)
+3 — Produces 15, ignores -2 and 0, and can explain the loop.
+2 — Mostly correct with one small syntax/logic mistake they can fix with a hint.
+1 — Understands that a loop and total are needed but cannot complete it.
+0 — Cannot describe how to add the positive values.
+
+Do not penalize formatting or whether they use foreach, for, or LINQ.`
     },
 
     'csharp-rest-api': {
+      title: 'C# REST API Basics',
       language: 'csharp',
-      content: `// Third-party REST API integration (C#)
+      content: `// 5-minute REST API question
 //
-// Scenario:
-// An ASP.NET application sends a document to a third-party extraction API.
-// POST /documents returns JSON like:
-// { "id": "doc-123", "status": "processed", "policyNumber": "P-1001" }
-//
-// Implement ExtractPolicyAsync. Discuss your choices as you work.
-//
-// Requirements:
-// 1. Use the injected HttpClient; do not create a new HttpClient per request.
-// 2. Send document bytes as multipart/form-data.
-// 3. Deserialize a successful JSON response.
-// 4. Handle non-success status codes, timeouts, and malformed JSON.
-// 5. Pass the CancellationToken through.
-// 6. Explain what you would log and which failures you would retry.
+// Complete GetPolicyAsync.
+// It should GET "api/policies/42", reject an unsuccessful response,
+// and return the response body as text.
 
-using System;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 
-public record ExtractionResult(string Id, string Status, string PolicyNumber);
-
-public sealed class DocumentExtractionClient
+public class PolicyClient
 {
-    private readonly HttpClient _httpClient;
+    private readonly HttpClient _client;
 
-    public DocumentExtractionClient(HttpClient httpClient)
+    public PolicyClient(HttpClient client)
     {
-        _httpClient = httpClient;
+        _client = client;
     }
 
-    public async Task<ExtractionResult> ExtractPolicyAsync(
-        byte[] document,
-        string fileName,
-        CancellationToken cancellationToken)
+    public async Task<string> GetPolicyAsync()
     {
-        // TODO: implement
-        throw new NotImplementedException();
+        // Write 3 lines here.
+        return "";
     }
-}
+}`,
+      answerKey: `PLAIN-ENGLISH ANSWER
+Use the provided HttpClient to send a GET request. Check that the server
+returned success. Then read and return the response text.
 
-// Follow-ups:
-// - Where should the API key be stored?
-// - How would you prevent duplicate submissions?
-// - How would you test this without calling the real provider?`
+ONE GOOD SOLUTION
+var response = await _client.GetAsync("api/policies/42");
+response.EnsureSuccessStatusCode();
+return await response.Content.ReadAsStringAsync();
+
+HOW TO GRADE (0–3)
+3 — Uses await, the injected _client, checks success, and returns the body.
+2 — Gets and returns the response but misses the status check or needs a hint.
+1 — Knows an HTTP GET is needed but cannot form the method.
+0 — Creates unrelated code or cannot explain request versus response.
+
+BONUS DISCUSSION (do not require)
+- API keys belong in configuration, not source code.
+- Production code should accept a CancellationToken.
+- JSON would normally be deserialized into a C# model.`
     },
 
     'aspnet-mvc': {
+      title: 'ASP.NET MVC Validation',
       language: 'csharp',
-      content: `// ASP.NET MVC controller design
+      content: `// 5-minute ASP.NET MVC question
 //
-// Implement the POST action below for creating an insurance policy.
-//
-// Requirements:
-// 1. Reject invalid input using ModelState.
-// 2. Never bind or trust CreatedByUserId from the browser.
-// 3. Call the service asynchronously and pass the cancellation token.
-// 4. Use the Post/Redirect/Get pattern after success.
-// 5. Show a useful error without exposing internal exception details.
+// If the form is invalid, show the same view again.
+// If it is valid, save it and go to the Index page.
 
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-
-public sealed class CreatePolicyViewModel
+[HttpPost]
+public async Task<IActionResult> Create(PolicyViewModel model)
 {
-    [Required]
-    public string PolicyNumber { get; set; } = "";
+    // Add the missing validation check here.
 
-    [Required]
-    public string CustomerName { get; set; } = "";
+    await _policyService.CreateAsync(model);
+    return RedirectToAction("Index");
+}`,
+      answerKey: `PLAIN-ENGLISH ANSWER
+Before saving, ask MVC whether validation failed. If it did, return the same
+view with the entered model so the user can correct it.
 
-    public DateTime EffectiveDate { get; set; }
+ONE GOOD SOLUTION
+if (!ModelState.IsValid)
+{
+    return View(model);
 }
 
-public interface IPolicyService
-{
-    Task<int> CreateAsync(
-        CreatePolicyViewModel model,
-        string currentUserId,
-        CancellationToken cancellationToken);
-}
+await _policyService.CreateAsync(model);
+return RedirectToAction("Index");
 
-public sealed class PoliciesController : Controller
-{
-    private readonly IPolicyService _policyService;
+HOW TO GRADE (0–3)
+3 — Correct ModelState check, returns View(model), saves only when valid.
+2 — Correct idea with a small syntax mistake or returns View() without model.
+1 — Says validation must happen but does not know ModelState.
+0 — Always saves invalid input or cannot explain the two paths.
 
-    public PoliciesController(IPolicyService policyService)
-    {
-        _policyService = policyService;
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(
-        CreatePolicyViewModel model,
-        CancellationToken cancellationToken)
-    {
-        // TODO: implement
-        throw new NotImplementedException();
-    }
-}
-
-// Follow-ups:
-// - Why use a view model instead of the EF entity?
-// - What problem does ValidateAntiForgeryToken address?
-// - Where should business validation live?`
+BONUS: Redirecting after success prevents accidental duplicate form posts.`
     },
 
     'sql-policy-query': {
+      title: 'SQL Server Simple Join',
       language: 'sql',
-      content: `-- SQL Server query exercise
+      content: `-- 5-minute SQL Server question
 --
--- Tables:
--- Customers(CustomerId int PK, Name nvarchar(100), IsActive bit)
--- Policies(PolicyId int PK, CustomerId int FK, PolicyNumber varchar(30),
---          Status varchar(20), EffectiveDate date)
--- Documents(DocumentId int PK, PolicyId int FK, ProcessedAt datetime2,
---           ExtractionStatus varchar(20))
+-- Customers(CustomerId, Name)
+-- Policies(PolicyId, CustomerId, PolicyNumber, Status)
 --
--- Write one query returning each active customer who has an Active policy:
---   CustomerId
---   CustomerName
---   PolicyNumber
---   EffectiveDate
---   SuccessfulDocumentCount
---   LastSuccessfulDocumentAt
---
--- Include active policies even when they have no successfully processed
--- documents. Sort newest policies first.
+-- Return the customer name and policy number for Active policies.
 
--- Write your query here:
+SELECT
+    -- Write the two columns here
+FROM Customers c
+    -- Add the JOIN to Policies here
+WHERE
+    -- Keep only Active policies here
+;`,
+      answerKey: `PLAIN-ENGLISH ANSWER
+Select Name from Customers and PolicyNumber from Policies. Join the tables
+where their CustomerId values match. Filter Status to Active.
 
+ONE GOOD SOLUTION
+SELECT
+    c.Name,
+    p.PolicyNumber
+FROM Customers c
+INNER JOIN Policies p ON p.CustomerId = c.CustomerId
+WHERE p.Status = 'Active';
 
--- Follow-ups:
--- 1. Why is LEFT JOIN useful here?
--- 2. Which indexes would you consider?
--- 3. What changes if a customer can have several active policies?
--- 4. How would you safely filter EffectiveDate using an input parameter?`
+HOW TO GRADE (0–3)
+3 — Correct columns, JOIN condition, and Active filter.
+2 — Right structure with one minor alias or syntax error.
+1 — Can explain matching CustomerId but cannot write the JOIN.
+0 — No relationship between the tables or uses unrelated columns.
+
+Important: INNER JOIN or JOIN are both correct here.`
     },
 
     'ef-linq': {
+      title: 'LINQ Simple Filter',
       language: 'csharp',
-      content: `// Entity Framework Core + LINQ
+      content: `// 5-minute LINQ question
 //
-// Implement GetEmployeesAsync.
-//
-// Requirements:
-// 1. Return only active employees in the requested department.
-// 2. Search first name, last name, or email when search is not blank.
-// 3. Sort by last name and then first name.
-// 4. Return only the requested page.
-// 5. Project directly to EmployeeSummary; do not load full entities.
-// 6. This is read-only.
+// Complete the query so it returns the names of active employees,
+// sorted alphabetically.
 
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+var names = employees
+    // Filter IsActive == true
+    // Sort by Name
+    // Select Name
+    .ToList();`,
+      answerKey: `PLAIN-ENGLISH ANSWER
+Filter the list to active employees, sort those employees by name, and then
+select just each employee's name.
 
-public record EmployeeSummary(int Id, string FullName, string Email);
+ONE GOOD SOLUTION
+var names = employees
+    .Where(e => e.IsActive)
+    .OrderBy(e => e.Name)
+    .Select(e => e.Name)
+    .ToList();
 
-public async Task<List<EmployeeSummary>> GetEmployeesAsync(
-    AppDbContext db,
-    int departmentId,
-    string? search,
-    int page,
-    int pageSize,
-    CancellationToken cancellationToken)
-{
-    // TODO: implement with EF Core and LINQ
-    throw new System.NotImplementedException();
-}
+HOW TO GRADE (0–3)
+3 — Correct Where, OrderBy, Select, and ToList sequence.
+2 — Gets two of the three operations or fixes the third with a hint.
+1 — Understands filtering but cannot express a LINQ lambda.
+0 — Cannot identify IsActive as the filter.
 
-// Follow-ups:
-// - What does AsNoTracking change?
-// - Why project before ToListAsync?
-// - What SQL do you expect EF Core to generate?
-// - How would you prevent unreasonable page sizes?`
+BONUS: With Entity Framework, this query is normally translated into SQL.`
     },
 
     'solid-refactor': {
+      title: 'SOLID Single Responsibility',
       language: 'csharp',
-      content: `// SOLID refactoring exercise
+      content: `// 5-minute SOLID question
 //
-// Review this class. Identify concrete design/testability problems, then
-// refactor it. You do not need to write infrastructure implementations.
+// This class saves a policy AND sends an email.
+// What are its two responsibilities?
+// Name two interfaces you could inject to separate them.
 
-using System;
-using System.Data.SqlClient;
-using System.Net.Mail;
-
-public sealed class PolicyProcessor
+public class PolicyService
 {
-    public void Process(int policyId)
+    public void CreatePolicy(Policy policy)
     {
-        using var connection =
-            new SqlConnection("Server=prod;Database=Insurance;User Id=admin;Password=secret");
-        connection.Open();
+        // Saves policy to SQL Server
+        SaveToDatabase(policy);
 
-        var command = new SqlCommand(
-            "UPDATE Policies SET Status='Verified' WHERE PolicyId=" + policyId,
-            connection);
-        command.ExecuteNonQuery();
-
-        new SmtpClient("smtp.company.com")
-            .Send("system@company.com", "manager@company.com",
-                  "Policy verified", policyId.ToString());
-
-        Console.WriteLine("Processed policy " + policyId);
+        // Sends confirmation email
+        SendEmail(policy.CustomerEmail);
     }
 }
 
-// Discuss:
-// 1. Which SOLID principles are under pressure here?
-// 2. How would dependency injection improve the design?
-// 3. How should the SQL and configuration be corrected?
-// 4. What should happen if the email fails after the database update?
-// 5. Show at least two focused interfaces and a refactored processor.`
+// Write your answer as comments below:
+// Responsibility 1:
+// Responsibility 2:
+// Interface 1:
+// Interface 2:`,
+      answerKey: `PLAIN-ENGLISH ANSWER
+The class has two jobs: storing policy data and sending email. Separating them
+makes each part easier to change and test.
+
+ONE GOOD ANSWER
+// Responsibility 1: Save/read policy data.
+// Responsibility 2: Send policy notifications.
+// Interface 1: IPolicyRepository
+// Interface 2: IEmailService (or INotificationService)
+
+HOW TO GRADE (0–3)
+3 — Clearly identifies both jobs and proposes two sensible interfaces.
+2 — Identifies both jobs but names only one interface or needs a hint.
+1 — Says "too much in one class" without identifying the two jobs.
+0 — Cannot see any reason to separate database and email work.
+
+Do not require memorized SOLID definitions. Practical reasoning is better.`
     },
 
     'csharp-debugging': {
+      title: 'C# Simple Debugging',
       language: 'csharp',
-      content: `// C# debugging and reliability
+      content: `// 5-minute C# debugging question
 //
-// This method sometimes returns incomplete results and occasionally hides
-// production failures. Find the problems and rewrite it.
+// This should return the average of 10 and 20, which is 15.
+// Find and fix the bug.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-public async Task<List<Policy>> LoadPoliciesAsync(IEnumerable<int> ids)
+public class Program
 {
-    var policies = new List<Policy>();
-
-    ids.ToList().ForEach(async id =>
+    public static int Average(int first, int second)
     {
-        try
-        {
-            var policy = await _repository.GetByIdAsync(id);
-            if (policy != null)
-                policies.Add(policy);
-        }
-        catch (Exception)
-        {
-            // Ignore failures
-        }
-    });
+        int total = first + second;
+        return total; // Bug is on this line.
+    }
 
-    return policies;
-}
+    public static void Main()
+    {
+        Console.WriteLine(Average(10, 20)); // Expected: 15
+    }
+}`,
+      answerKey: `PLAIN-ENGLISH ANSWER
+The method returns the total (30), but an average is the total divided by the
+number of values (2).
 
-// Follow-ups:
-// - Why does async inside List.ForEach cause trouble?
-// - Is List<T> safe for concurrent writes?
-// - When would Task.WhenAll be appropriate?
-// - How should cancellation, logging, and partial failure be handled?`
+ONE GOOD FIX
+return total / 2;
+
+HOW TO GRADE (0–3)
+3 — Changes the return to total / 2 and gets 15.
+2 — Explains division is missing but makes a small syntax mistake.
+1 — Recognizes 30 is wrong but cannot state the average formula.
+0 — Cannot identify why the method returns 30.
+
+OPTIONAL FOLLOW-UP
+Ask what Average(10, 21) returns. With int it returns 15, not 15.5. A decimal
+or double return type would preserve the fractional part.`
     },
 
     'dotnet-interview-plan': {
+      title: 'Simple .NET Interview Plan',
       language: 'markdown',
-      content: `# Junior .NET Interview — 55-minute plan
+      content: `# Simple junior .NET interview plan
 
-## 1. Very simple coding warm-up (5 minutes)
-Load: **C# — Very Simple Warm-up**
+Each coding question is intended to take about 5 minutes.
 
-Look for:
-- a working loop and condition
-- correct decimal total
-- ability to run and check the examples
-- clear explanation of basic choices
+1. C# — Very Simple Warm-up
+2. C# — Simple Debugging
+3. SQL Server — Simple Join
+4. LINQ — Simple Filter
+5. ASP.NET MVC — Validation
+6. C# — REST API Basics
+7. SOLID — Single Responsibility
 
-This is an orientation exercise. Give help with the editor if needed and do not
-overweight small syntax mistakes.
+Suggested approach:
+- Read the prompt aloud.
+- Let the candidate ask questions.
+- Give one small hint after about two minutes.
+- Ask them to run the runnable C# questions.
+- Use the interviewer-only Answer Key button for grading.
+- Small syntax mistakes matter less than understanding.`,
+      answerKey: `OVERALL GRADING
+Each exercise has a 0–3 score in its own Answer Key.
 
-## 2. Experience walkthrough (8 minutes)
-- Describe the insurance document workflow you built.
-- What data went to the third-party API and what came back?
-- Tell me about a production failure you diagnosed personally.
-- What part did you implement yourself versus with team support?
+Suggested total for 7 questions: 21 points
+18–21 — Strong junior performance
+14–17 — Reasonable junior performance; discuss weak areas
+9–13  — Significant gaps; consider experience claims carefully
+0–8   — Fundamentals were not demonstrated
 
-## 3. REST integration exercise (15 minutes)
-Load: **C# — Third-party REST API**
+This is only a guide. Communication, honesty, response to hints, and ability
+to explain their own resume should influence the final decision.
 
-Look for:
-- injected HttpClient and async/await
-- cancellation and clear failure handling
-- JSON deserialization and validation
-- secrets kept outside source code
-- reasonable retry/idempotency discussion
+Good signs:
+- Explains what they are doing.
+- Tests the result instead of guessing.
+- Accepts a hint and applies it.
+- Says when they do not know something.
 
-## 4. SQL Server exercise (12 minutes)
-Load: **SQL Server — Policy Query**
-
-Look for:
-- correct INNER/LEFT JOIN choices
-- GROUP BY and aggregates
-- parameterization, not string concatenation
-- practical index reasoning
-
-## 5. EF Core / LINQ exercise (10 minutes)
-Load: **Entity Framework + LINQ**
-
-Look for:
-- filtering before materialization
-- projection, paging, AsNoTracking
-- awareness that LINQ is translated to SQL
-
-## 6. Design discussion (7 minutes)
-Load: **SOLID — Refactoring**
-
-Look for:
-- specific responsibilities, not memorized definitions
-- dependency injection and small interfaces
-- transaction/failure-boundary reasoning
-
-## 7. Candidate questions (3 minutes)
-
-Calibration: this is a junior candidate. Prefer clear reasoning, safe defaults,
-and ability to learn over perfect framework syntax. Ask for clarification and
-give one hint before treating a stall as a negative signal.`
+Warning signs:
+- Cannot explain code they just wrote.
+- Gives memorized terms without concrete meaning.
+- Claims the editor is the problem before reading simple errors.
+- Resume examples cannot be described in practical detail.`
     }
   };
 })();
