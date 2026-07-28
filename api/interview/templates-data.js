@@ -23,16 +23,16 @@ using System;
 
 public class Policy
 {
-    public decimal[] MonthlyPremiums { get; set; }
+    public double[] MonthlyPremiums { get; set; }
 
-    public Policy(decimal[] monthlyPremiums)
+    public Policy(double[] monthlyPremiums)
     {
         MonthlyPremiums = monthlyPremiums;
     }
 
-    public decimal CalculateDiscountedPremiumTotal()
+    public double CalculateDiscountedPremiumTotal()
     {
-        decimal total = 0m;
+        double total = 0;
 
         // Write your loop and filter here.
 
@@ -45,7 +45,7 @@ public class Program
     public static void Main()
     {
         var policy = new Policy(
-            new decimal[] { 100.00m, 120.00m, 0.00m, -20.00m });
+            new double[] { 100.00, 120.00, 0.00, -20.00 });
 
         Console.WriteLine(
             policy.CalculateDiscountedPremiumTotal()); // Expected: 198.00
@@ -53,19 +53,19 @@ public class Program
 }`,
       answerKey: `PLAIN-ENGLISH ANSWER
 Loop through the policy's MonthlyPremiums. Skip zero and negative values. For
-each valid premium, keep 90% of it by multiplying by 0.90m, then add that
-discounted value to the total. The decimal type is normally used for money.
+each valid premium, keep 90% of it by multiplying by 0.90, then add that
+discounted value to the total.
 
 ONE GOOD SOLUTION
-public decimal CalculateDiscountedPremiumTotal()
+public double CalculateDiscountedPremiumTotal()
 {
-    decimal total = 0m;
+    double total = 0;
 
-    foreach (decimal premium in MonthlyPremiums)
+    foreach (double premium in MonthlyPremiums)
     {
         if (premium > 0)
         {
-            total += premium * 0.90m;
+            total += premium * 0.90;
         }
     }
 
@@ -83,7 +83,7 @@ HOW TO GRADE (0–3)
 ALSO CORRECT WITH LINQ
 return MonthlyPremiums
     .Where(premium => premium > 0)
-    .Sum(premium => premium * 0.90m);
+    .Sum(premium => premium * 0.90);
 
 Do not require LINQ, rounding, null handling, or exactly 12 array entries. The
 point is to warm up with an object, an array, a filter, and simple arithmetic
