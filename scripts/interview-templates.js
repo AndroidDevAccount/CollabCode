@@ -308,17 +308,52 @@ Important: INNER JOIN or JOIN are both correct here.`
       language: 'csharp',
       content: `// 5-minute LINQ question
 //
+// Each Employee object has these fields:
+// - Id: the employee's unique number
+// - Name: the employee's full name
+// - Department: the team where the employee works
+// - IsActive: true if the employee currently works for the company
+//
+// SAMPLE DATA
+// Id | Name          | Department | IsActive
+// 1  | Carla Gomez   | Claims     | true
+// 2  | Bob Smith     | Sales      | false
+// 3  | Alice Johnson | Claims     | true
+//
 // Complete the query so it returns the names of active employees,
 // sorted alphabetically.
+//
+// EXPECTED RESULT
+// Alice Johnson
+// Carla Gomez
+
+using System.Collections.Generic;
+using System.Linq;
+
+var employees = new List<Employee>
+{
+    new Employee { Id = 1, Name = "Carla Gomez", Department = "Claims", IsActive = true },
+    new Employee { Id = 2, Name = "Bob Smith", Department = "Sales", IsActive = false },
+    new Employee { Id = 3, Name = "Alice Johnson", Department = "Claims", IsActive = true }
+};
 
 var names = employees
     // Filter IsActive == true
     // Sort by Name
     // Select Name
-    .ToList();`,
+    .ToList();
+
+public class Employee
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = "";
+    public string Department { get; set; } = "";
+    public bool IsActive { get; set; }
+}`,
       answerKey: `PLAIN-ENGLISH ANSWER
 Filter the list to active employees, sort those employees by name, and then
-select just each employee's name.
+select just each employee's name. Bob is removed because IsActive is false.
+Alice appears before Carla because OrderBy sorts the names alphabetically.
 
 ONE GOOD SOLUTION
 var names = employees
