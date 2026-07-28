@@ -204,6 +204,14 @@
     const viewAllSessionsBtn = document.getElementById('viewAllSessionsBtn');
     const closeSessionsModalBtn = document.getElementById('closeSessionsModalBtn');
     const interviewerNameInput = document.getElementById('interviewerName');
+    const returnToInterviewBtn = document.getElementById('returnToInterviewBtn');
+
+    if (returnToInterviewBtn && !returnToInterviewBtn.dataset.bound) {
+      returnToInterviewBtn.dataset.bound = 'true';
+      returnToInterviewBtn.addEventListener('click', function() {
+        document.getElementById('adminDashboardModal').style.display = 'none';
+      });
+    }
 
     restoreRecentAdminSession();
     

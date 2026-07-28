@@ -98,6 +98,7 @@
     
     // Update UI based on role
     const endSessionBtn = document.getElementById('end-session-btn');
+    const dashboardBtn = document.getElementById('dashboard-btn');
     
     if (isAdmin) {
       console.log('Admin user detected - showing End Interview button');
@@ -110,12 +111,14 @@
       if (endSessionBtn) {
         console.log('End Interview button is visible for admin');
       }
+      if (dashboardBtn) dashboardBtn.style.display = 'inline-block';
     } else {
       console.log('Non-admin user - hiding End Interview button');
       // Hide button for non-admin users
       if (endSessionBtn) {
         endSessionBtn.style.display = 'none';
       }
+      if (dashboardBtn) dashboardBtn.style.display = 'none';
     }
   }
 
@@ -478,6 +481,9 @@
 
     // Interview question templates (interviewer only)
     const templateSelector = document.getElementById('template-selector');
+    const questionSetSelector = document.getElementById('question-set-selector');
+    const importQuestionSetButton = document.getElementById('import-question-set-btn');
+    const questionSetFileInput = document.getElementById('question-set-file-input');
     const answerKeyButton = document.getElementById('answer-key-btn');
     const answerKeyPanel = document.getElementById('answer-key-panel');
     const firepadContainer = document.getElementById('firepad-container');
@@ -513,9 +519,113 @@
     if (templateSelector) {
       if (!currentUser || !currentUser.isAdmin) {
         templateSelector.style.display = 'none';
+        if (questionSetSelector) questionSetSelector.style.display = 'none';
+        if (importQuestionSetButton) importQuestionSetButton.style.display = 'none';
         if (answerKeyButton) answerKeyButton.style.display = 'none';
         closeAnswerKeyPanel();
       } else {
+        const customSetStorageKey = 'opencollab_custom_question_sets';
+        let questionSets = {};
+        let selectedQuestionSet = '';
+
+        function readCustomQuestionSets() {
+          try {
+            const saved = JSON.parse(localStorage.getItem(customSetStorageKey) || '[]');
+            return Array.isArray(saved) ? saved : [];
+          } catch (error) {
+            console.warn('Ignoring invalid saved question sets:', error);
+            return [];
+          }
+        }
+
+        function validateImportedQuestionSet(value) {
+          if (!value || typeof value !== 'object' || Array.isArray(value)) {
+            throw new Error('The JSON file must contain one question-set object.');
+          }
+          if (typeof value.name !== 'string' || !value.name.trim()) {
+            throw new Error('The question set needs a non-empty "name".');
+          }
+          if (!Array.isArray(value.questions) || value.questions.length === 0) {
+            throw new Error('The question set needs a non-empty "questions" array.');
+          }
+
+          const allowedLanguages = Object.keys(languageConfig);
+          const questions = value.questions.map((question, index) => {
+            if (!question || typeof question !== 'object') {
+              throw new Error(`Question ${index + 1} must be an object.`);
+            }
+            for (const field of ['title', 'language', 'content', 'answerKey']) {
+              if (typeof question[field] !== 'string' || !question[field].trim()) {
+                throw new Error(`Question ${index + 1} needs a non-empty "${field}".`);
+              }
+            }
+            if (!allowedLanguages.includes(question.language)) {
+              throw new Error(
+                `Question ${index + 1} uses unsupported language "${question.language}".`
+              );
+            }
+            return {
+              title: question.title.trim().slice(0, 120),
+              language: question.language,
+              content: question.content,
+              answerKey: question.answerKey
+            };
+          });
+
+          return {
+            id: value.id || `set-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+            name: value.name.trim().slice(0, 120),
+            description: typeof value.description === 'string'
+              ? value.description.trim().slice(0, 300)
+              : '',
+            questions
+          };
+        }
+
+        function installCustomQuestionSets(customSets) {
+          customSets.forEach(customSet => {
+            const setKey = `custom:${customSet.id}`;
+            const questionKeys = customSet.questions.map((question, index) => {
+              const questionKey = `${setKey}:${index}`;
+              window.InterviewTemplates[questionKey] = question;
+              return questionKey;
+            });
+            questionSets[setKey] = {
+              title: customSet.name,
+              description: customSet.description,
+              questions: questionKeys,
+              custom: true
+            };
+          });
+        }
+
+        function renderQuestionSetOptions() {
+          if (!questionSetSelector) return;
+          questionSetSelector.replaceChildren(new Option('Choose question set…', ''));
+          Object.entries(questionSets).forEach(([key, set]) => {
+            const option = new Option(set.custom ? `My Set — ${set.title}` : set.title, key);
+            option.title = set.description || '';
+            questionSetSelector.appendChild(option);
+          });
+          questionSetSelector.value = selectedQuestionSet;
+          questionSetSelector.style.display = 'inline-block';
+        }
+
+        function selectQuestionSet(setKey) {
+          const set = questionSets[setKey];
+          if (!set) return;
+          selectedQuestionSet = setKey;
+          localStorage.setItem('opencollab_selected_question_set', setKey);
+          templateSelector.replaceChildren(new Option(`Load from ${set.title}…`, ''));
+          set.questions.forEach(questionKey => {
+            const template = window.InterviewTemplates[questionKey];
+            if (!template) return;
+            templateSelector.appendChild(new Option(template.title, questionKey));
+          });
+          templateSelector.style.display = 'inline-block';
+          if (questionSetSelector) questionSetSelector.value = setKey;
+        }
+
         try {
           const response = await fetch('/api/interview/templates', {
             method: 'GET',
@@ -528,21 +638,57 @@
           }
 
           window.InterviewTemplates = data.templates;
-          while (templateSelector.options.length > 1) {
-            templateSelector.remove(1);
-          }
-          Object.entries(data.templates).forEach(([key, template]) => {
-            const option = document.createElement('option');
-            option.value = key;
-            option.textContent = template.title;
-            templateSelector.appendChild(option);
-          });
-          templateSelector.style.display = 'inline-block';
+          questionSets = data.questionSets || {
+            'all-questions': {
+              title: 'All Questions',
+              questions: Object.keys(data.templates)
+            }
+          };
+          installCustomQuestionSets(readCustomQuestionSets());
+          const savedSelection = localStorage.getItem('opencollab_selected_question_set');
+          selectedQuestionSet = questionSets[savedSelection]
+            ? savedSelection
+            : (data.defaultQuestionSet || Object.keys(questionSets)[0]);
+          renderQuestionSetOptions();
+          selectQuestionSet(selectedQuestionSet);
         } catch (error) {
           console.error('Failed to load protected interview templates:', error);
           templateSelector.style.display = 'none';
           if (answerKeyButton) answerKeyButton.style.display = 'none';
           return;
+        }
+
+        if (importQuestionSetButton && questionSetFileInput) {
+          importQuestionSetButton.style.display = 'inline-block';
+          importQuestionSetButton.addEventListener('click', function() {
+            questionSetFileInput.value = '';
+            questionSetFileInput.click();
+          });
+          questionSetFileInput.addEventListener('change', async function() {
+            const file = this.files?.[0];
+            if (!file) return;
+            try {
+              const importedSet = validateImportedQuestionSet(
+                JSON.parse(await file.text())
+              );
+              const customSets = readCustomQuestionSets()
+                .filter(set => set.id !== importedSet.id);
+              customSets.push(importedSet);
+              localStorage.setItem(customSetStorageKey, JSON.stringify(customSets));
+              installCustomQuestionSets([importedSet]);
+              renderQuestionSetOptions();
+              selectQuestionSet(`custom:${importedSet.id}`);
+              showNotification(`Imported "${importedSet.name}" with ${importedSet.questions.length} questions.`);
+            } catch (error) {
+              alert(`Could not import question set: ${error.message}`);
+            }
+          });
+        }
+
+        if (questionSetSelector) {
+          questionSetSelector.addEventListener('change', function() {
+            if (this.value) selectQuestionSet(this.value);
+          });
         }
 
         if (answerKeyButton) answerKeyButton.style.display = 'inline-block';
@@ -596,7 +742,8 @@
               setTimeout(loadOverviewWhenReady, 50);
               return;
             }
-            loadInterviewTemplate('dotnet-interview-plan');
+            const firstQuestion = questionSets[selectedQuestionSet]?.questions?.[0];
+            if (firstQuestion) loadInterviewTemplate(firstQuestion);
           };
           loadOverviewWhenReady();
         }
@@ -660,6 +807,18 @@
     const shareBtn = document.getElementById('share-btn');
     if (shareBtn) {
       shareBtn.addEventListener('click', shareSession);
+    }
+
+    // Return to the admin dashboard without ending or disconnecting the session.
+    const dashboardBtn = document.getElementById('dashboard-btn');
+    if (dashboardBtn) {
+      dashboardBtn.addEventListener('click', function() {
+        if (!currentUser?.isAdmin) return;
+        const dashboard = document.getElementById('adminDashboardModal');
+        const returnButton = document.getElementById('returnToInterviewBtn');
+        if (returnButton) returnButton.style.display = 'inline-block';
+        if (dashboard) dashboard.style.display = 'flex';
+      });
     }
 
     // Run button

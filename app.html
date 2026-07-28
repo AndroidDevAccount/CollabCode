@@ -234,6 +234,10 @@
                 <p class="dashboard-subtitle">Manage your technical interview sessions</p>
               </div>
             </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+            <button id="returnToInterviewBtn" class="logout-btn-modern" style="display: none;">
+              <span>Return to Interview</span>
+            </button>
             <button id="adminLogoutBtn" class="logout-btn-modern">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -242,6 +246,7 @@
               </svg>
               <span>Logout</span>
             </button>
+            </div>
           </div>
         </div>
         
@@ -558,9 +563,14 @@
             </optgroup>
           </select>
 
-          <select id="template-selector" title="Load Interview Question" style="display: none;">
-            <option value="">Load .NET question…</option>
+          <select id="question-set-selector" title="Choose Question Set" style="display: none;">
+            <option value="">Choose question set…</option>
           </select>
+          <select id="template-selector" title="Load Interview Question" style="display: none;">
+            <option value="">Load question…</option>
+          </select>
+          <button id="import-question-set-btn" type="button" style="display: none;" title="Import a JSON question set">Import Set</button>
+          <input id="question-set-file-input" type="file" accept=".json,application/json" hidden>
           <button id="answer-key-btn" type="button" style="display: none;" disabled>
             Answer Key
           </button>
@@ -588,6 +598,7 @@
         <div class="center-info">
           <img src="/images/favicon/apple-touch-icon-57x57.png" alt="Atom Tickets" width="24" height="24" style="margin-right: 8px; vertical-align: middle;">
           <span id="session-info"></span>
+          <button id="dashboard-btn" type="button" class="dashboard-session-button" style="display: none;">Dashboard</button>
           <button id="end-session-btn" class="end-session-button" style="margin-left: 15px;">End Interview</button>
           <span id="user-count" class="user-count"></span>
         </div>
