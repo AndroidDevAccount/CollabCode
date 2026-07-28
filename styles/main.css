@@ -2447,6 +2447,7 @@ a.powered-by-firepad {
   max-height: calc(100vh - 32px);
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .dashboard-session-button {
@@ -2521,21 +2522,26 @@ a.powered-by-firepad {
 }
 
 .dashboard-close-btn {
-  width: 42px;
-  height: 42px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  width: 36px;
+  height: 36px;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 8px;
-  color: white;
-  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid #d1d5db;
+  border-radius: 50%;
+  color: #4b5563;
+  background: white;
   font-size: 26px;
   line-height: 1;
   cursor: pointer;
 }
 
 .dashboard-close-btn:hover {
-  background: rgba(255, 255, 255, 0.35);
+  color: #111827;
+  background: #f3f4f6;
 }
 
 /* Interviewer Card */
