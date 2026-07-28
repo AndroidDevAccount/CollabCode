@@ -371,6 +371,76 @@ HOW TO GRADE (0–3)
 BONUS: With Entity Framework, this query is normally translated into SQL.`
     },
 
+    'ef-migration': {
+      title: 'Entity Framework — Add a Field',
+      language: 'csharp',
+      content: `// 5-minute Entity Framework Core question
+//
+// DAY-TO-DAY SCENARIO
+// This Policy class already exists in a working application and its SQL Server
+// table already contains policy records.
+//
+// The business now wants to store an optional renewal date. Old policies might
+// not have a renewal date, so the new field must allow null.
+//
+// Complete these two tasks:
+// 1. Add a nullable RenewalDate field to the Policy class.
+// 2. Write the commands you would run to create and apply an EF Core migration.
+
+using System;
+
+public class Policy
+{
+    public int Id { get; set; }
+    public string PolicyNumber { get; set; } = "";
+    public string CustomerName { get; set; } = "";
+    public decimal Premium { get; set; }
+
+    // TODO 1: Add the nullable RenewalDate property here.
+}
+
+// TODO 2: Write the two EF Core commands as comments:
+// Create migration:
+// Apply migration:`,
+      answerKey: `PLAIN-ENGLISH ANSWER
+Entity Framework maps the Policy class to a database table. Changing the C#
+class alone does not update the existing SQL Server table. A migration records
+the required schema change, and the database-update command applies it.
+
+The question says the date is optional. DateTime is a value type, so DateTime?
+is used to allow null. Existing database rows can then have NULL in the new
+RenewalDate column.
+
+ONE GOOD MODEL CHANGE
+public DateTime? RenewalDate { get; set; }
+
+GOOD COMMANDS — .NET CLI
+dotnet ef migrations add AddRenewalDateToPolicy
+dotnet ef database update
+
+ALSO CORRECT — VISUAL STUDIO PACKAGE MANAGER CONSOLE
+Add-Migration AddRenewalDateToPolicy
+Update-Database
+
+The migration name is chosen by the developer; any clear name is acceptable.
+
+HOW TO GRADE (0-3)
+3 — Adds DateTime?, creates a migration, and applies it with correct commands.
+2 — Correct nullable property and remembers migrations, but misses or slightly
+    mistypes one command.
+1 — Adds DateTime or DateTime? but does not know how the database is updated.
+0 — Only edits SQL manually or cannot connect the model change to the database.
+
+WHAT TO LISTEN FOR
+- Nullable avoids inventing a date for existing policies.
+- The generated migration should be reviewed before applying it.
+- Production migrations should follow the team's deployment process; developers
+  should not casually update a production database from their laptop.
+
+DO NOT PENALIZE
+Accept either the dotnet CLI or Package Manager Console command style.`
+    },
+
     'solid-refactor': {
       title: 'SOLID Single Responsibility',
       language: 'csharp',
@@ -535,7 +605,7 @@ A separate result array is completely correct. Its extra space is O(n).`
       language: 'markdown',
       content: `# Welcome to your junior .NET interview
 
-You will work through seven short exercises. Each one is intended to take about
+You will work through eight short exercises. Each one is intended to take about
 five minutes. The goal is to understand how you approach a problem—not to test
 whether you have memorized every piece of syntax.
 
@@ -545,9 +615,10 @@ whether you have memorized every piece of syntax.
 2. C# — Easy Running Sum
 3. SQL Server — Simple Join
 4. LINQ — Simple Filter
-5. ASP.NET MVC — Validation
-6. C# — REST API Basics
-7. SOLID — Single Responsibility
+5. Entity Framework — Add a Field and Migration
+6. ASP.NET MVC — Validation
+7. C# — REST API Basics
+8. SOLID — Single Responsibility
 
 ## How to approach each exercise
 
@@ -563,11 +634,11 @@ reasoning, honest communication, and learning from a hint are all valuable.`,
       answerKey: `OVERALL GRADING
 Each exercise has a 0–3 score in its own Answer Key.
 
-Suggested total for 7 questions: 21 points
-18–21 — Strong junior performance
-14–17 — Reasonable junior performance; discuss weak areas
-9–13  — Significant gaps; consider experience claims carefully
-0–8   — Fundamentals were not demonstrated
+Suggested total for 8 questions: 24 points
+21–24 — Strong junior performance
+16–20 — Reasonable junior performance; discuss weak areas
+10–15 — Significant gaps; consider experience claims carefully
+0–9   — Fundamentals were not demonstrated
 
 This is only a guide. Communication, honesty, response to hints, and ability
 to explain their own resume should influence the final decision.
