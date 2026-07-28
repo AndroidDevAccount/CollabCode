@@ -229,7 +229,9 @@
       // Create Firepad with minimal options
       const currentLanguage = document.getElementById('language-selector')?.value || 'javascript';
       firepad = Firepad.fromACE(firepadRef, editor, {
-        defaultText: isNew ? getDefaultCode(currentLanguage) : '',
+        // New interviews start blank; the interviewer deliberately chooses a
+        // question from Interview Tools when they are ready.
+        defaultText: isNew && !currentUser.isAdmin ? getDefaultCode(currentLanguage) : '',
         userId: currentUser.id
       });
       
@@ -484,7 +486,6 @@
 
     // Interview question templates (interviewer only)
     const templateSelector = document.getElementById('template-selector');
-    const questionSetSelector = document.getElementById('question-set-selector');
     const importQuestionSetButton = document.getElementById('import-question-set-btn');
     const questionSetFileInput = document.getElementById('question-set-file-input');
     const answerKeyButton = document.getElementById('answer-key-btn');
@@ -522,14 +523,12 @@
     if (templateSelector) {
       if (!currentUser || !currentUser.isAdmin) {
         templateSelector.style.display = 'none';
-        if (questionSetSelector) questionSetSelector.style.display = 'none';
         if (importQuestionSetButton) importQuestionSetButton.style.display = 'none';
         if (answerKeyButton) answerKeyButton.style.display = 'none';
         closeAnswerKeyPanel();
       } else {
         const customSetStorageKey = 'opencollab_custom_question_sets';
         let questionSets = {};
-        let selectedQuestionSet = '';
 
         function readCustomQuestionSets() {
           try {
@@ -602,31 +601,19 @@
           });
         }
 
-        function renderQuestionSetOptions() {
-          if (!questionSetSelector) return;
-          questionSetSelector.replaceChildren(new Option('Choose question set…', ''));
-          Object.entries(questionSets).forEach(([key, set]) => {
-            const option = new Option(set.custom ? `My Set — ${set.title}` : set.title, key);
-            option.title = set.description || '';
-            questionSetSelector.appendChild(option);
-          });
-          questionSetSelector.value = selectedQuestionSet;
-          questionSetSelector.style.display = 'inline-block';
-        }
-
-        function selectQuestionSet(setKey) {
-          const set = questionSets[setKey];
-          if (!set) return;
-          selectedQuestionSet = setKey;
-          localStorage.setItem('opencollab_selected_question_set', setKey);
-          templateSelector.replaceChildren(new Option(`Load from ${set.title}…`, ''));
-          set.questions.forEach(questionKey => {
-            const template = window.InterviewTemplates[questionKey];
-            if (!template) return;
-            templateSelector.appendChild(new Option(template.title, questionKey));
+        function renderQuestionOptions() {
+          templateSelector.replaceChildren(new Option('Load Questions…', ''));
+          Object.values(questionSets).forEach(set => {
+            const group = document.createElement('optgroup');
+            group.label = set.custom ? `My Set — ${set.title}` : set.title;
+            set.questions.forEach(questionKey => {
+              const template = window.InterviewTemplates[questionKey];
+              if (!template) return;
+              group.appendChild(new Option(template.title, questionKey));
+            });
+            if (group.children.length > 0) templateSelector.appendChild(group);
           });
           templateSelector.style.display = 'inline-block';
-          if (questionSetSelector) questionSetSelector.value = setKey;
         }
 
         try {
@@ -648,12 +635,7 @@
             }
           };
           installCustomQuestionSets(readCustomQuestionSets());
-          const savedSelection = localStorage.getItem('opencollab_selected_question_set');
-          selectedQuestionSet = questionSets[savedSelection]
-            ? savedSelection
-            : (data.defaultQuestionSet || Object.keys(questionSets)[0]);
-          renderQuestionSetOptions();
-          selectQuestionSet(selectedQuestionSet);
+          renderQuestionOptions();
         } catch (error) {
           console.error('Failed to load protected interview templates:', error);
           templateSelector.style.display = 'none';
@@ -679,18 +661,11 @@
               customSets.push(importedSet);
               localStorage.setItem(customSetStorageKey, JSON.stringify(customSets));
               installCustomQuestionSets([importedSet]);
-              renderQuestionSetOptions();
-              selectQuestionSet(`custom:${importedSet.id}`);
+              renderQuestionOptions();
               showNotification(`Imported "${importedSet.name}" with ${importedSet.questions.length} questions.`);
             } catch (error) {
               alert(`Could not import question set: ${error.message}`);
             }
-          });
-        }
-
-        if (questionSetSelector) {
-          questionSetSelector.addEventListener('change', function() {
-            if (this.value) selectQuestionSet(this.value);
           });
         }
 
@@ -735,23 +710,6 @@
           closeAnswerKey.addEventListener('click', closeAnswerKeyPanel);
         }
 
-        if (currentSessionIsNew) {
-          let overviewLoadAttempts = 0;
-          const loadOverviewWhenReady = function() {
-            if (!firepadReady) {
-              overviewLoadAttempts += 1;
-              if (overviewLoadAttempts >= 100) {
-                console.error('Timed out waiting to load the interview overview');
-                return;
-              }
-              setTimeout(loadOverviewWhenReady, 50);
-              return;
-            }
-            const firstQuestion = questionSets[selectedQuestionSet]?.questions?.[0];
-            if (firstQuestion) loadInterviewTemplate(firstQuestion);
-          };
-          loadOverviewWhenReady();
-        }
       }
     }
 

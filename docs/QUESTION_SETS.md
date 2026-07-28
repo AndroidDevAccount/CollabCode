@@ -1,7 +1,8 @@
 # Custom interview question sets
 
-Administrators can choose a built-in question set from the interview toolbar or
-select **Import Set** to load their own JSON file.
+Administrators open **Interview Tools** and use the single **Load Questions…**
+menu. Questions are grouped under their built-in or custom set name. Select
+**Import Set** to load a JSON file containing another group.
 
 An imported file has this shape:
 
