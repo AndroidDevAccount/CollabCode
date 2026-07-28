@@ -2,54 +2,53 @@
 
 module.exports = {
     'csharp-warmup': {
-      title: 'C# Very Simple Warm-up',
+      title: 'C# Warm-up — Annual Premium',
       language: 'csharp',
       content: `// 5-minute C# warm-up
 //
-// Complete AddPositiveNumbers.
-// Add only numbers greater than zero and return the total.
+// We are starting a small insurance application.
 //
-// Example: { 10, -2, 5, 0 } should return 15.
+// Complete CalculateAnnualPremium.
+// A policy costs the same amount each month, so multiply the monthly
+// premium by 12 and return the result.
+//
+// Example: a monthly premium of 100.00 should return 1200.00.
 
 using System;
 
 public class Program
 {
-    public static int AddPositiveNumbers(int[] numbers)
+    public static decimal CalculateAnnualPremium(decimal monthlyPremium)
     {
-        // Write your code here.
-        return 0;
+        // Write one line here.
+        return 0m;
     }
 
     public static void Main()
     {
-        Console.WriteLine(AddPositiveNumbers(
-            new int[] { 10, -2, 5, 0 })); // Expected: 15
+        Console.WriteLine(
+            CalculateAnnualPremium(100.00m)); // Expected: 1200.00
     }
 }`,
       answerKey: `PLAIN-ENGLISH ANSWER
-Start a total at zero. Loop through every number. If the number is greater
-than zero, add it to the total. Return the total after the loop.
+There are 12 months in a year, so multiply the monthly premium by 12. The
+decimal type is commonly used for money because it represents decimal values
+more predictably than float or double.
 
 ONE GOOD SOLUTION
-public static int AddPositiveNumbers(int[] numbers)
+public static decimal CalculateAnnualPremium(decimal monthlyPremium)
 {
-    int total = 0;
-    foreach (int number in numbers)
-    {
-        if (number > 0)
-            total += number;
-    }
-    return total;
+    return monthlyPremium * 12;
 }
 
 HOW TO GRADE (0–3)
-3 — Produces 15, ignores -2 and 0, and can explain the loop.
-2 — Mostly correct with one small syntax/logic mistake they can fix with a hint.
-1 — Understands that a loop and total are needed but cannot complete it.
-0 — Cannot describe how to add the positive values.
+3 — Returns monthlyPremium * 12 and can explain the result.
+2 — Has the correct multiplication with a small syntax or return-type mistake.
+1 — Understands the annual amount uses 12 months but cannot write the return.
+0 — Cannot identify the calculation.
 
-Do not penalize formatting or whether they use foreach, for, or LINQ.`
+Do not require input validation or rounding in this warm-up. The point is to
+help the candidate get comfortable before creating the insurance classes.`
     },
 
     'csharp-rest-api': {
@@ -556,74 +555,88 @@ injection without remembering the words "Dependency Inversion."`
     },
 
     'csharp-debugging': {
-      title: 'C# Easy — Running Sum',
+      title: 'C# OOP — Model Customers and Policies',
       language: 'csharp',
-      content: `// 5-minute LeetCode-style Easy question
+      content: `// 5-minute C# object-oriented design question
 //
-// Given an array of integers, return its running sum.
-// Each result position contains the sum of all numbers up to that position.
+// We are continuing the small insurance application from the warm-up.
+// Right now, its information is written as one loose list:
 //
-// EXAMPLE
-// Input:    [1, 2, 3, 4]
-// Output:   [1, 3, 6, 10]
+// Customer ID: 1
+// Customer name: Alice Johnson
+// Customer email: alice@example.com
+// Policy ID: 101
+// Policy number: AUTO-1001
+// Status: Active
+// Premium: 125.50
 //
-// Explanation:
-// result[0] = 1
-// result[1] = 1 + 2 = 3
-// result[2] = 1 + 2 + 3 = 6
-// result[3] = 1 + 2 + 3 + 4 = 10
+// YOUR TASK
+// Break this information into two C# classes: Customer and Policy.
 //
-// Complete RunningSum. You may modify and return the input array,
-// or create and return a new array.
+// Customer should contain:
+// - Id
+// - Name
+// - Email
+//
+// Policy should contain:
+// - Id
+// - PolicyNumber
+// - Status
+// - Premium
+// - A Customer property connecting the policy to its owner
+//
+// Choose sensible C# types and create both classes below.
 
-using System;
-
-public class Program
-{
-    public static int[] RunningSum(int[] numbers)
-    {
-        // Write your loop here.
-        return numbers;
-    }
-
-    public static void Main()
-    {
-        int[] result = RunningSum(new int[] { 1, 2, 3, 4 });
-        Console.WriteLine(string.Join(", ", result)); // Expected: 1, 3, 6, 10
-    }
-}`,
+`,
       answerKey: `PLAIN-ENGLISH ANSWER
-Walk through the array from left to right while remembering the total so far.
-Add the current number to that total, then store the total at the current
-position. For [1, 2, 3, 4], the remembered totals are 1, 3, 6, and 10.
+The customer and policy are different concepts, so each gets its own class.
+Policy refers to a Customer object instead of repeating the customer's name and
+email. This relationship is called composition: one object contains or refers
+to another object.
 
 ONE GOOD SOLUTION
-public static int[] RunningSum(int[] numbers)
+public class Customer
 {
-    int total = 0;
-
-    for (int i = 0; i < numbers.Length; i++)
-    {
-        total += numbers[i];
-        numbers[i] = total;
-    }
-
-    return numbers;
+    public int Id { get; set; }
+    public string Name { get; set; } = "";
+    public string Email { get; set; } = "";
 }
 
-HOW TO GRADE (0–3)
-3 — Produces [1, 3, 6, 10] with one loop and returns the array.
-2 — Understands the running total but has a small indexing or syntax mistake.
-1 — Can calculate the example manually but cannot turn it into a loop.
-0 — Adds only neighboring values or returns the unchanged input.
+public class Policy
+{
+    public int Id { get; set; }
+    public string PolicyNumber { get; set; } = "";
+    public string Status { get; set; } = "";
+    public decimal Premium { get; set; }
+    public Customer Customer { get; set; } = new Customer();
+}
 
-OPTIONAL FOLLOW-UP
-Ask for the time and space complexity:
-- Time is O(n) because every number is visited once.
-- Extra space is O(1) for this solution because it modifies the input array.
+WHY THESE TYPES?
+- int is reasonable for the sample IDs.
+- string fits names, email addresses, policy numbers, and the simple status.
+- decimal is normally preferred over double for money.
+- Customer connects the two objects and keeps customer details together.
 
-ALSO ACCEPT
-A separate result array is completely correct. Its extra space is O(n).`
+HOW TO GRADE (0-3)
+3 — Creates both classes, places fields on the appropriate class, uses sensible
+    types, and connects Policy to Customer.
+2 — Creates both classes with most fields but misses the relationship or makes
+    a small type/syntax mistake.
+1 — Creates only one large class or needs substantial help separating the data.
+0 — Cannot translate the described information into C# classes and properties.
+
+ACCEPTABLE VARIATIONS
+- Fields instead of properties are acceptable for this short exercise, although
+  properties are conventional in C# application models.
+- CustomerId on Policy is a reasonable database-oriented answer. Ask how the
+  code would access the customer's name; adding Customer as well is stronger.
+- An enum for Status is a good enhancement but is not required.
+- Constructors are optional. Auto-properties are enough for full credit.
+
+HOW THIS CONNECTS TO LATER QUESTIONS
+The later SQL, MVC, Entity Framework, LINQ, and SOLID exercises build on these
+same Customer and Policy ideas. The candidate does not need every production
+field yet; this is only the starting model.`
     },
 
     'ai-prompting': {
@@ -809,8 +822,8 @@ whether you have memorized every piece of syntax.
 
 ## What we will cover
 
-1. C# — Simple warm-up
-2. C# — Easy Running Sum
+1. C# — Insurance premium warm-up
+2. C# — Model Customers and Policies
 3. SQL Server — Simple Join
 4. LINQ — Simple Filter
 5. Entity Framework — Add a Field and Migration
