@@ -1,6 +1,7 @@
 // Main Application Controller
 (function() {
   let appInitialized = false;
+  let adminDashboardInitialized = false;
 
   // Initialize the application
   function init() {
@@ -196,6 +197,11 @@
 
   // Setup admin dashboard
   function setupAdminDashboard() {
+    if (adminDashboardInitialized) {
+      restoreRecentAdminSession();
+      return;
+    }
+    adminDashboardInitialized = true;
     const createSessionBtn = document.getElementById('createSessionBtn');
     const adminSessionCode = document.getElementById('adminSessionCode');
     const adminJoinBtn = document.getElementById('adminJoinBtn');
@@ -480,6 +486,10 @@
       document.getElementById('activeSession').style.display = 'none';
     });
   }
+
+  // firepad.js uses this when Dashboard is opened from a directly resumed
+  // #sessionCode URL, where the normal login/dashboard setup was skipped.
+  window.prepareAdminDashboard = setupAdminDashboard;
 
   function rememberAdminSession(sessionCode) {
     localStorage.setItem('recent_admin_session', JSON.stringify({
@@ -1830,6 +1840,19 @@
       console.error('CRITICAL: main-container element not found in DOM!');
       alert('Error: Unable to load editor interface. Please refresh the page.');
       return;
+    }
+
+    const existingMainContainer = document.getElementById('main-container');
+    const existingSessionCode = existingMainContainer?.dataset.sessionCode;
+    if (existingSessionCode && existingSessionCode !== sessionCode) {
+      if (!isNew) {
+        window.location.hash = sessionCode;
+        window.location.reload();
+        return;
+      }
+      if (typeof window.resetCollaborativeSession === 'function') {
+        window.resetCollaborativeSession();
+      }
     }
 
     // Always initialize activity monitoring here as well as in the join flow.
