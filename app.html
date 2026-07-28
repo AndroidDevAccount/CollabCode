@@ -22,7 +22,7 @@
 
     <!-- styling -->
     <!-- Custom style -->
-    <link rel="stylesheet" href="styles/main.css?v=11">
+    <link rel="stylesheet" href="styles/main.css?v=12">
     <!-- Firepad -->
     <link rel="stylesheet" href="https://cdn.firebase.com/libs/firepad/1.4.0/firepad.css" />
 
@@ -612,11 +612,13 @@
           <span id="session-info"></span>
           <button id="dashboard-btn" type="button" class="dashboard-session-button" style="display: none;">Dashboard</button>
           <button id="end-session-btn" class="end-session-button">End Interview</button>
-          <span id="user-count" class="user-count"></span>
+          <div class="connected-users-control">
+            <button id="user-count" class="user-count" type="button" aria-haspopup="true" aria-expanded="false"></button>
+            <div id="users-list" class="connected-users-menu" hidden></div>
+          </div>
         </div>
 
         <div class="right-controls">
-          <div id="users-list"></div>
           <button id="notes-toggle-btn" class="notes-button" style="display: none;">📝 Notes</button>
           <button id="answer-key-btn" type="button" class="notes-button" style="display: none;" disabled>Answer Key</button>
           <button id="run-btn" class="run-button" hidden>▶ Run</button>
@@ -748,7 +750,7 @@
     <!-- Simple Templates (must load before firepad.js) -->
     <script src="scripts/simple-templates.js?v=2"></script>
     <script src="scripts/custom-dialogs.js?v=2"></script>
-    <script src="scripts/firepad.js?v=16"></script>
+    <script src="scripts/firepad.js?v=17"></script>
     <script src="scripts/interview-notes.js?v=4"></script>
     <script src="scripts/slack-integration.js?v=4"></script>
     <script src="scripts/posthog-tracking.js?v=2"></script>

@@ -447,59 +447,34 @@
       const isCurrentUser = userId === currentUser.id;
       const isAdmin = user.isAdmin === true ||
         (isCurrentUser && currentUser.isAdmin === true);
-      const badge = document.createElement(
-        isCurrentUser && isAdmin ? 'button' : 'div'
-      );
-      badge.className = 'user-badge';
-      if (isCurrentUser) {
-        badge.className += ' current-user';
-      }
-      if (isCurrentUser && isAdmin) {
-        badge.className += ' admin-menu-trigger';
-        badge.type = 'button';
-        badge.setAttribute('aria-haspopup', 'true');
-        badge.setAttribute('aria-expanded', 'false');
-      }
-      badge.textContent = isCurrentUser && isAdmin
-        ? 'Admin'
-        : `${isAdmin ? 'Admin' : 'Candidate'}: ${user.name}`;
-      badge.title = isCurrentUser && isAdmin
-        ? 'Open admin menu'
-        : `${isAdmin ? 'Admin' : 'Candidate'} currently connected`;
-      badge.style.borderLeft = `3px solid ${user.color}`;
-      usersList.appendChild(badge);
-
-      if (isCurrentUser && isAdmin) {
-        const menu = document.createElement('div');
-        menu.className = 'admin-pill-menu';
-        menu.hidden = true;
-
-        [
-          ['Dashboard', () => document.getElementById('dashboard-btn')?.click()],
-          ['Manage Admins', () => {
-            document.getElementById('dashboard-btn')?.click();
-            setTimeout(() => document.getElementById('manageAdminsBtn')?.click(), 0);
-          }],
-          ['Logout', () => {
-            Auth.logout();
-            window.location.hash = '';
-            window.location.reload();
-          }]
-        ].forEach(([label, action]) => {
-          const item = document.createElement('button');
-          item.type = 'button';
-          item.textContent = label;
-          item.addEventListener('click', action);
-          menu.appendChild(item);
-        });
-
-        badge.addEventListener('click', function() {
-          menu.hidden = !menu.hidden;
-          badge.setAttribute('aria-expanded', String(!menu.hidden));
-        });
-        usersList.appendChild(menu);
-      }
+      const rawName = String(user.name || (isAdmin ? 'Admin' : 'Candidate'));
+      const displayName = rawName.includes('(')
+        ? rawName.split('(')[0].trim()
+        : (rawName.includes('@') ? rawName.split('@')[0] : rawName);
+      const row = document.createElement('div');
+      row.className = 'connected-user-row';
+      row.textContent = `${displayName}: ${isAdmin ? 'Admin' : 'Candidate'}`;
+      const dot = document.createElement('span');
+      dot.className = 'connected-user-dot';
+      dot.style.backgroundColor = user.color || '#4caf50';
+      row.prepend(dot);
+      usersList.appendChild(row);
     });
+
+    const userCountButton = document.getElementById('user-count');
+    if (userCountButton && !userCountButton.dataset.menuBound) {
+      userCountButton.dataset.menuBound = 'true';
+      userCountButton.addEventListener('click', function() {
+        usersList.hidden = !usersList.hidden;
+        this.setAttribute('aria-expanded', String(!usersList.hidden));
+      });
+      document.addEventListener('click', function(event) {
+        if (!event.target.closest('.connected-users-control')) {
+          usersList.hidden = true;
+          userCountButton.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
   }
 
   // Update user count
@@ -507,7 +482,7 @@
     const count = Object.keys(users).length;
     const userCountEl = document.getElementById('user-count');
     if (userCountEl) {
-      userCountEl.textContent = `${count} ${count === 1 ? 'user' : 'users'} online`;
+      userCountEl.textContent = `${count} ${count === 1 ? 'user' : 'users'} connected`;
     }
   }
 
