@@ -240,10 +240,40 @@ If the candidate uses it correctly and still checks ModelState, give full credit
       language: 'sql',
       content: `-- 5-minute SQL Server question
 --
--- Customers(CustomerId, Name)
--- Policies(PolicyId, CustomerId, PolicyNumber, Status)
+-- TABLES
 --
--- Return the customer name and policy number for Active policies.
+-- Customers
+-- +------------+---------------+
+-- | CustomerId | Name          |
+-- +------------+---------------+
+-- | 1          | Alice Johnson |
+-- | 2          | Bob Smith     |
+-- | 3          | Carla Gomez   |
+-- +------------+---------------+
+--
+-- Policies
+-- +----------+------------+--------------+-----------+
+-- | PolicyId | CustomerId | PolicyNumber | Status    |
+-- +----------+------------+--------------+-----------+
+-- | 101      | 1          | AUTO-1001    | Active    |
+-- | 102      | 1          | HOME-2001    | Cancelled |
+-- | 103      | 2          | AUTO-1002    | Active    |
+-- | 104      | 3          | LIFE-3001    | Pending   |
+-- +----------+------------+--------------+-----------+
+--
+-- CustomerId connects each policy to its customer. For example,
+-- policy AUTO-1001 has CustomerId 1, so it belongs to Alice Johnson.
+--
+-- TASK
+-- Return the customer name and policy number for Active policies only.
+--
+-- EXPECTED RESULT
+-- +---------------+--------------+
+-- | Name          | PolicyNumber |
+-- +---------------+--------------+
+-- | Alice Johnson | AUTO-1001    |
+-- | Bob Smith     | AUTO-1002    |
+-- +---------------+--------------+
 
 SELECT
     -- Write the two columns here
