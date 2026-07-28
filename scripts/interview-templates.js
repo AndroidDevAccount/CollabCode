@@ -151,26 +151,64 @@ BONUS DISCUSSION (do not require)
     },
 
     'aspnet-mvc': {
-      title: 'ASP.NET MVC Validation',
+      title: 'ASP.NET MVC — Form Validation',
       language: 'csharp',
       content: `// 5-minute ASP.NET MVC question
 //
-// If the form is invalid, show the same view again.
-// If it is valid, save it and go to the Index page.
+// The Razor page below submits a Policy Number to this controller.
+// A browser's "required" check can be bypassed, so the controller must
+// also reject a blank PolicyNumber.
+//
+// Complete the two TODOs in the controller:
+// 1. Add a field-specific validation error when PolicyNumber is blank.
+// 2. If validation failed, show the form again with the entered values.
+
+// Create.cshtml (frontend)
+// -----------------------
+// @model PolicyViewModel
+//
+// <form asp-action="Create" method="post">
+//     <label asp-for="PolicyNumber"></label>
+//     <input asp-for="PolicyNumber" required />
+//     <span asp-validation-for="PolicyNumber"></span>
+//     <button type="submit">Save</button>
+// </form>
+
+using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+
+public class PolicyViewModel
+{
+    public string PolicyNumber { get; set; } = "";
+}
 
 [HttpPost]
+[ValidateAntiForgeryToken]
 public async Task<IActionResult> Create(PolicyViewModel model)
 {
-    // Add the missing validation check here.
+    // TODO 1: If PolicyNumber is blank, add this message to ModelState:
+    // "Policy number is required."
+
+    // TODO 2: If ModelState is invalid, return View(model).
 
     await _policyService.CreateAsync(model);
     return RedirectToAction("Index");
 }`,
       answerKey: `PLAIN-ENGLISH ANSWER
-Before saving, ask MVC whether validation failed. If it did, return the same
-view with the entered model so the user can correct it.
+The HTML "required" attribute helps the user, but it is not security: a request
+can skip the browser. The controller checks PolicyNumber again. It adds an
+error for that field, then returns the same view and model when validation
+failed. The <span asp-validation-for="PolicyNumber"> displays the message.
 
 ONE GOOD SOLUTION
+if (string.IsNullOrWhiteSpace(model.PolicyNumber))
+{
+    ModelState.AddModelError(
+        nameof(model.PolicyNumber),
+        "Policy number is required.");
+}
+
 if (!ModelState.IsValid)
 {
     return View(model);
@@ -179,13 +217,22 @@ if (!ModelState.IsValid)
 await _policyService.CreateAsync(model);
 return RedirectToAction("Index");
 
-HOW TO GRADE (0–3)
-3 — Correct ModelState check, returns View(model), saves only when valid.
-2 — Correct idea with a small syntax mistake or returns View() without model.
-1 — Says validation must happen but does not know ModelState.
-0 — Always saves invalid input or cannot explain the two paths.
+HOW TO GRADE (0-3)
+3 — Adds a field-specific ModelState error, returns View(model) when invalid,
+    and saves only valid input.
+2 — Correct server-side check and invalid return, with a small syntax mistake
+    or a non-field-specific error.
+1 — Understands that the server must validate, but cannot implement both TODOs.
+0 — Relies only on HTML "required" or still saves a blank PolicyNumber.
 
-BONUS: Redirecting after success prevents accidental duplicate form posts.`
+WHAT TO LISTEN FOR
+- The browser check improves usability; server validation protects the app.
+- Returning View(model) preserves what the user typed and shows the error.
+- Redirecting after success helps prevent an accidental duplicate form post.
+
+ALTERNATIVE
+A [Required] attribute on PolicyNumber is also a good production approach.
+If the candidate uses it correctly and still checks ModelState, give full credit.`
     },
 
     'sql-policy-query': {
