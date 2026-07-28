@@ -557,6 +557,17 @@
               <option value="markdown">📝 Markdown</option>
             </optgroup>
           </select>
+
+          <select id="template-selector" title="Load Interview Question">
+            <option value="">Load .NET question…</option>
+            <option value="csharp-rest-api">C# — Third-party REST API</option>
+            <option value="aspnet-mvc">ASP.NET MVC — Controller Design</option>
+            <option value="sql-policy-query">SQL Server — Policy Query</option>
+            <option value="ef-linq">Entity Framework + LINQ</option>
+            <option value="solid-refactor">SOLID — Refactoring</option>
+            <option value="csharp-debugging">C# — Debugging & Reliability</option>
+            <option value="dotnet-interview-plan">Full .NET Interview Plan</option>
+          </select>
           
           <select id="theme-selector">
             <option value="monokai">Monokai</option>
@@ -707,6 +718,7 @@
 
     <!-- Simple Templates (must load before firepad.js) -->
     <script src="scripts/simple-templates.js?v=2"></script>
+    <script src="scripts/interview-templates.js?v=1"></script>
     <script src="scripts/custom-dialogs.js?v=2"></script>
     <script src="scripts/firepad.js?v=3"></script>
     <script src="scripts/interview-notes.js?v=3"></script>
