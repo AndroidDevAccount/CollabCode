@@ -600,12 +600,100 @@ ALSO ACCEPT
 A separate result array is completely correct. Its extra space is O(n).`
     },
 
+    'ai-prompting': {
+      title: 'AI Prompting — Describe a .NET Change',
+      language: 'markdown',
+      content: `# 5-minute AI prompting question
+
+## Scenario
+
+You are working on an existing ASP.NET Core MVC insurance application that uses
+Entity Framework Core and SQL Server.
+
+The Policies Index page already lists every policy. The product owner asks you
+to add a search box so users can find policies by customer name.
+
+The requested behavior is:
+
+- Add a customer-name search box to the existing Policies Index page.
+- An empty search should show every policy.
+- A non-empty search should show policies whose CustomerName contains the text.
+- Filter in the database with Entity Framework rather than loading every row
+  into memory first.
+- Keep the user's search text visible in the box after submitting.
+- Add tests for an empty search and a matching search.
+- Do not change unrelated application behavior.
+
+## Your task
+
+Write the prompt you would give an AI coding assistant to implement this change.
+
+There is no single exact answer. Your prompt should give the AI enough context
+to make a useful change and explain how you would check its work.
+
+Write your AI prompt below:
+
+`,
+      answerKey: `WHAT THIS QUESTION TESTS
+This is not a test of finding magic words. A good developer treats an AI like a
+new teammate: provide context, describe the desired behavior, set boundaries,
+request verification, and review the result instead of trusting it blindly.
+
+ONE STRONG EXAMPLE PROMPT
+We have an existing ASP.NET Core MVC application using Entity Framework Core
+and SQL Server. Please inspect the current Policy model, PoliciesController,
+Policies/Index.cshtml view, DbContext, and existing test conventions before
+editing anything.
+
+Add customer-name search to the existing Policies Index page:
+- Add a GET search input named customerName to the Razor view.
+- Accept the optional value in the Index action.
+- If it is blank, return all policies.
+- Otherwise, filter by CustomerName in the IQueryable before ToListAsync so
+  SQL Server performs the filtering.
+- Preserve the entered value in the search box after submission.
+- Follow the project's existing naming and styling patterns.
+- Do not modify unrelated files or add a migration unless the model changes.
+- Add tests for a blank search and a matching search.
+
+Before editing, tell me which files you expect to change and ask about anything
+the repository does not make clear. After editing, summarize the changes and
+run the relevant build and tests. Show me any failures instead of hiding them.
+
+WHY THIS IS STRONG
+- It identifies the technology and asks the AI to inspect the real project.
+- It translates the request into specific, observable behavior.
+- It prevents an inefficient in-memory filter.
+- It limits unrelated changes and unnecessary migrations.
+- It asks for tests, build verification, and honest reporting of failures.
+
+HOW TO GRADE (0-3)
+3 — Includes project context, clear requirements, important constraints, and a
+    request to test or verify the work.
+2 — Describes the feature clearly but misses either technical context,
+    boundaries, or verification.
+1 — Gives a vague request such as "add search" with little useful detail.
+0 — Provides no workable prompt or expects the AI output to be trusted without
+    review.
+
+GOOD FOLLOW-UP QUESTION
+Ask: "What would you personally check before accepting the AI's code?"
+
+Good answers include reviewing the diff, checking that filtering happens before
+ToListAsync, running tests, trying empty and matching searches, checking error
+handling, and confirming unrelated files were not changed.
+
+INTERVIEWER TIP
+Do not grade grammar or prompt length. A shorter prompt can earn full credit if
+it communicates the context, desired outcome, constraints, and verification.`
+    },
+
     'dotnet-interview-plan': {
       title: 'Your Junior .NET Interview',
       language: 'markdown',
       content: `# Welcome to your junior .NET interview
 
-You will work through eight short exercises. Each one is intended to take about
+You will work through nine short exercises. Each one is intended to take about
 five minutes. The goal is to understand how you approach a problem—not to test
 whether you have memorized every piece of syntax.
 
@@ -619,6 +707,7 @@ whether you have memorized every piece of syntax.
 6. ASP.NET MVC — Validation
 7. C# — REST API Basics
 8. SOLID — Single Responsibility
+9. AI — Prompt a Coding Assistant
 
 ## How to approach each exercise
 
@@ -634,11 +723,11 @@ reasoning, honest communication, and learning from a hint are all valuable.`,
       answerKey: `OVERALL GRADING
 Each exercise has a 0–3 score in its own Answer Key.
 
-Suggested total for 8 questions: 24 points
-21–24 — Strong junior performance
-16–20 — Reasonable junior performance; discuss weak areas
-10–15 — Significant gaps; consider experience claims carefully
-0–9   — Fundamentals were not demonstrated
+Suggested total for 9 questions: 27 points
+24–27 — Strong junior performance
+18–23 — Reasonable junior performance; discuss weak areas
+11–17 — Significant gaps; consider experience claims carefully
+0–10  — Fundamentals were not demonstrated
 
 This is only a guide. Communication, honesty, response to hints, and ability
 to explain their own resume should influence the final decision.
