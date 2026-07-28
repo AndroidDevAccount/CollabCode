@@ -788,10 +788,10 @@
           lastOpenedAt: Date.now()
         }));
         const dashboard = document.getElementById('adminDashboardModal');
-        const returnButton = document.getElementById('returnToInterviewBtn');
-        const closeButton = document.getElementById('closeDashboardBtn');
+        const mainContainer = document.getElementById('main-container');
         const activeSession = document.getElementById('activeSession');
         const activeSessionCode = document.getElementById('activeSessionCode');
+        const resumeInterviewButton = document.getElementById('resumeInterviewBtn');
         if (activeSessionCode) activeSessionCode.textContent = currentSessionCode;
         if (activeSession) {
           activeSession.style.display = 'block';
@@ -800,8 +800,8 @@
           if (badge) badge.textContent = 'LIVE';
           if (heading) heading.textContent = 'Active Session';
         }
-        if (returnButton) returnButton.style.display = 'inline-block';
-        if (closeButton) closeButton.style.display = 'inline-flex';
+        if (resumeInterviewButton) resumeInterviewButton.style.display = 'inline-block';
+        if (mainContainer) mainContainer.style.display = 'none';
         if (dashboard) dashboard.style.display = 'flex';
         document.getElementById('interview-tools-menu')?.removeAttribute('open');
       });

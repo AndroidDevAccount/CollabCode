@@ -22,7 +22,7 @@
 
     <!-- styling -->
     <!-- Custom style -->
-    <link rel="stylesheet" href="styles/main.css?v=8">
+    <link rel="stylesheet" href="styles/main.css?v=9">
     <!-- Firepad -->
     <link rel="stylesheet" href="https://cdn.firebase.com/libs/firepad/1.4.0/firepad.css" />
 
@@ -222,7 +222,7 @@
     </div>
     
     <!-- Admin Dashboard Modal - Professional Redesign -->
-    <div id="adminDashboardModal" class="modal" style="display: none;">
+    <div id="adminDashboardModal" class="dashboard-page" style="display: none;">
       <div class="modal-content dashboard-modal-content">
         <!-- Header with gradient background -->
         <div class="dashboard-header-modern">
@@ -235,10 +235,6 @@
               </div>
             </div>
             <div style="display: flex; gap: 10px; align-items: center;">
-            <button id="returnToInterviewBtn" class="logout-btn-modern" style="display: none;">
-              <span>Return to Interview</span>
-            </button>
-            <button id="closeDashboardBtn" class="dashboard-close-btn" type="button" style="display: none;" aria-label="Close dashboard">×</button>
             <button id="adminLogoutBtn" class="logout-btn-modern">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -325,6 +321,7 @@
                 </svg>
                 <span>Copy</span>
               </button>
+              <button id="resumeInterviewBtn" class="action-btn-secondary">Resume Interview</button>
             </div>
           </div>
           
@@ -759,12 +756,12 @@
     <!-- Simple Templates (must load before firepad.js) -->
     <script src="scripts/simple-templates.js?v=2"></script>
     <script src="scripts/custom-dialogs.js?v=2"></script>
-    <script src="scripts/firepad.js?v=11"></script>
+    <script src="scripts/firepad.js?v=12"></script>
     <script src="scripts/interview-notes.js?v=4"></script>
     <script src="scripts/slack-integration.js?v=4"></script>
     <script src="scripts/posthog-tracking.js?v=2"></script>
     <script src="scripts/session-tracking.js?v=1"></script>
     <script src="scripts/activity-monitor.js?v=4"></script>
-    <script src="scripts/app.js?v=6"></script>
+    <script src="scripts/app.js?v=7"></script>
   </body>
 </html>
