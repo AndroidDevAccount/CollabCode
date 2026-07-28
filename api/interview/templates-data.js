@@ -160,9 +160,9 @@ BONUS DISCUSSION (do not require)
 // A browser's "required" check can be bypassed, so the controller must
 // also reject a blank PolicyNumber.
 //
-// Complete the two TODOs in the controller:
-// 1. Add a field-specific validation error when PolicyNumber is blank.
-// 2. If validation failed, show the form again with the entered values.
+// Complete the two TODOs:
+// 1. Add a validation attribute to PolicyNumber so it is required.
+// 2. In the controller, show the form again when validation failed.
 
 // Create.cshtml (frontend)
 // -----------------------
@@ -176,11 +176,14 @@ BONUS DISCUSSION (do not require)
 // </form>
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 public class PolicyViewModel
 {
+    // TODO 1: Make this required with the message:
+    // "Policy number is required."
     public string PolicyNumber { get; set; } = "";
 }
 
@@ -188,9 +191,6 @@ public class PolicyViewModel
 [ValidateAntiForgeryToken]
 public async Task<IActionResult> Create(PolicyViewModel model)
 {
-    // TODO 1: If PolicyNumber is blank, add this message to ModelState:
-    // "Policy number is required."
-
     // TODO 2: If ModelState is invalid, return View(model).
 
     await _policyService.CreateAsync(model);
@@ -198,17 +198,15 @@ public async Task<IActionResult> Create(PolicyViewModel model)
 }`,
       answerKey: `PLAIN-ENGLISH ANSWER
 The HTML "required" attribute helps the user, but it is not security: a request
-can skip the browser. The controller checks PolicyNumber again. It adds an
-error for that field, then returns the same view and model when validation
-failed. The <span asp-validation-for="PolicyNumber"> displays the message.
+can skip the browser. In MVC, a normal required-field rule belongs on the view
+model as a [Required] data annotation. Model binding runs that validation on the
+server and adds any failure to ModelState. The controller returns the same view
+when ModelState is invalid, and <span asp-validation-for="PolicyNumber">
+displays the field's error message.
 
 ONE GOOD SOLUTION
-if (string.IsNullOrWhiteSpace(model.PolicyNumber))
-{
-    ModelState.AddModelError(
-        nameof(model.PolicyNumber),
-        "Policy number is required.");
-}
+[Required(ErrorMessage = "Policy number is required.")]
+public string PolicyNumber { get; set; } = "";
 
 if (!ModelState.IsValid)
 {
@@ -219,10 +217,10 @@ await _policyService.CreateAsync(model);
 return RedirectToAction("Index");
 
 HOW TO GRADE (0-3)
-3 — Adds a field-specific ModelState error, returns View(model) when invalid,
-    and saves only valid input.
-2 — Correct server-side check and invalid return, with a small syntax mistake
-    or a non-field-specific error.
+3 — Adds [Required], returns View(model) when ModelState is invalid, and saves
+    only valid input.
+2 — Uses the correct validation pattern with a small syntax mistake, missing
+    custom message, or returns View() without preserving the model.
 1 — Understands that the server must validate, but cannot implement both TODOs.
 0 — Relies only on HTML "required" or still saves a blank PolicyNumber.
 
@@ -231,9 +229,18 @@ WHAT TO LISTEN FOR
 - Returning View(model) preserves what the user typed and shows the error.
 - Redirecting after success helps prevent an accidental duplicate form post.
 
-ALTERNATIVE
-A [Required] attribute on PolicyNumber is also a good production approach.
-If the candidate uses it correctly and still checks ModelState, give full credit.`
+WHEN ModelState.AddModelError IS APPROPRIATE
+Manual errors are still useful for rules that a simple attribute cannot express,
+such as "this policy number already exists" after checking the database:
+
+ModelState.AddModelError(
+    nameof(model.PolicyNumber),
+    "That policy number already exists.");
+
+WEB FORMS NOTE
+Setting an error label or using validator controls is familiar in ASP.NET Web
+Forms. In ASP.NET MVC, validation attributes + ModelState +
+asp-validation-for are the conventional equivalent.`
     },
 
     'sql-policy-query': {
