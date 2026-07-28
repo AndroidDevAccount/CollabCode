@@ -1,7 +1,27 @@
 'use strict';
 
 const jwt = require('jsonwebtoken');
-const templates = require('./templates-data');
+const templateData = require('./templates-data');
+
+const templateOrder = [
+  'csharp-warmup',
+  'csharp-debugging',
+  'sql-policy-query',
+  'ef-linq',
+  'ef-migration',
+  'aspnet-mvc',
+  'csharp-rest-api',
+  'solid-refactor',
+  'ai-prompting',
+  'frontend-css',
+  'dotnet-interview-plan'
+];
+
+const templates = Object.fromEntries(
+  templateOrder
+    .filter(key => templateData[key])
+    .map(key => [key, templateData[key]])
+);
 
 module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 'private, no-store');
