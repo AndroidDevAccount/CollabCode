@@ -27,11 +27,13 @@ const Auth = (function() {
   function init() {
     const stored = localStorage.getItem('auth_session');
     if (stored) {
+      let restoredAdmin = false;
       try {
         const data = JSON.parse(stored);
         // Validate token hasn't expired
         if (data.expiresAt && new Date(data.expiresAt) > new Date()) {
           session = data;
+          restoredAdmin = true;
         } else {
           localStorage.removeItem('auth_session');
         }
@@ -39,13 +41,24 @@ const Auth = (function() {
         console.error('Session restore failed:', e);
         localStorage.removeItem('auth_session');
       }
-      return;
+      if (restoredAdmin) return;
     }
 
     const candidateStored = sessionStorage.getItem('candidate_session');
     if (candidateStored) {
       try {
-        session = JSON.parse(candidateStored);
+        const candidate = JSON.parse(candidateStored);
+        if (!candidate || typeof candidate.userName !== 'string' || !candidate.userName.trim()) {
+          throw new Error('Invalid candidate session');
+        }
+        session = {
+          isAuthenticated: true,
+          isAdmin: false,
+          userName: candidate.userName,
+          email: null,
+          token: null,
+          expiresAt: null
+        };
       } catch (e) {
         console.error('Candidate session restore failed:', e);
         sessionStorage.removeItem('candidate_session');

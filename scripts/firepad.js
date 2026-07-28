@@ -507,7 +507,7 @@
   }
 
   // Settings sync (simplified)
-  async function setupSettingsSync() {
+  function setupSettingsSync() {
     const settingsRef = sessionRef.child('settings');
     
     // Language selector
@@ -574,7 +574,8 @@
     }
 
     window.closeInterviewAnswerKey = closeAnswerKeyPanel;
-    if (templateSelector) {
+    async function bootstrapTemplates() {
+      if (!templateSelector) return;
       if (!currentUser || !currentUser.isAdmin) {
         templateSelector.style.display = 'none';
         if (answerKeyButton) answerKeyButton.style.display = 'none';
@@ -618,7 +619,9 @@
           });
 
           return {
-            id: value.id || `set-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+            id: typeof value.id === 'string' && value.id.trim()
+              ? value.id.trim().slice(0, 80)
+              : `set-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
             name: value.name.trim().slice(0, 120),
             description: typeof value.description === 'string'
               ? value.description.trim().slice(0, 300)
@@ -714,7 +717,9 @@
           }
           if (activeQuestionSetKey && !activeInterviewTemplateKey) {
             const firstQuestion = questionSets[activeQuestionSetKey].questions[0];
-            if (firstQuestion) loadInterviewTemplate(firstQuestion);
+            if (firstQuestion) {
+              loadInterviewTemplate(firstQuestion, { skipConfirm: currentSessionIsNew });
+            }
           }
           if (activeQuestionSetKey) renderLoadedQuestions();
           else renderQuestionSetPicker();
@@ -763,9 +768,18 @@
         }
 
         if (answerKeyButton) answerKeyButton.style.display = 'inline-block';
-        function loadInterviewTemplate(templateKey) {
+        function loadInterviewTemplate(templateKey, options = {}) {
           const template = window.InterviewTemplates?.[templateKey];
           if (!template) return;
+
+          const existing = editor ? editor.getValue().trim() : '';
+          const defaultContent =
+            '// Welcome to Collaborative Code Editor!\n// Start coding here...';
+          if (!options.skipConfirm && existing && existing !== defaultContent &&
+              !confirm('Loading this question will replace the current code for everyone. Continue?')) {
+            renderLoadedQuestions();
+            return;
+          }
 
           activeInterviewTemplateKey = templateKey;
           if (answerKeyButton) answerKeyButton.disabled = false;
@@ -820,7 +834,7 @@
             const template = window.InterviewTemplates?.[activeInterviewTemplateKey];
             if (!template?.answerKey) return;
 
-            if (answerKeyPanel.style.display === 'none') {
+            if (getComputedStyle(answerKeyPanel).display === 'none') {
               openAnswerKeyPanel(template);
             } else {
               closeAnswerKeyPanel();
@@ -835,6 +849,11 @@
 
       }
     }
+    bootstrapTemplates().catch(function(error) {
+      console.error('Failed to initialize interview templates:', error);
+      if (templateSelector) templateSelector.style.display = 'none';
+      if (answerKeyButton) answerKeyButton.style.display = 'none';
+    });
 
     // Theme selector
     const themeSelector = document.getElementById('theme-selector');

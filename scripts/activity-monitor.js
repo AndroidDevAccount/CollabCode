@@ -565,6 +565,15 @@
       `;
       document.body.appendChild(indicator);
 
+      function clampIndicatorToViewport() {
+        const rect = indicator.getBoundingClientRect();
+        const maxLeft = Math.max(0, window.innerWidth - indicator.offsetWidth);
+        const maxTop = Math.max(0, window.innerHeight - indicator.offsetHeight);
+        indicator.style.left = `${Math.min(maxLeft, Math.max(0, rect.left))}px`;
+        indicator.style.top = `${Math.min(maxTop, Math.max(0, rect.top))}px`;
+        indicator.style.bottom = 'auto';
+      }
+
       const savedPosition = sessionStorage.getItem('activity-indicator-position');
       if (savedPosition) {
         try {
@@ -576,6 +585,8 @@
           sessionStorage.removeItem('activity-indicator-position');
         }
       }
+      requestAnimationFrame(clampIndicatorToViewport);
+      window.addEventListener('resize', clampIndicatorToViewport);
 
       let dragState = null;
       indicator.addEventListener('pointerdown', function(event) {
