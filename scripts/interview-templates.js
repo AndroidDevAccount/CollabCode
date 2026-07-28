@@ -1,5 +1,48 @@
 (function() {
   window.InterviewTemplates = {
+    'csharp-warmup': {
+      language: 'csharp',
+      content: `// C# warm-up — total the valid policy premiums
+//
+// Complete CalculateTotalPremium.
+//
+// Rules:
+// 1. Add each positive premium to the total.
+// 2. Ignore zero and negative values.
+// 3. Return the total.
+//
+// Example:
+// CalculateTotalPremium(new decimal[] { 100m, 50m, -10m, 0m })
+// should return 150m.
+
+using System;
+
+public class Program
+{
+    public static decimal CalculateTotalPremium(decimal[] premiums)
+    {
+        // Write your code here.
+        return 0m;
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(CalculateTotalPremium(
+            new decimal[] { 100m, 50m, -10m, 0m })); // Expected: 150
+
+        Console.WriteLine(CalculateTotalPremium(
+            new decimal[] { 25.50m, 74.50m }));      // Expected: 100
+
+        Console.WriteLine(CalculateTotalPremium(
+            new decimal[] { -5m, 0m }));             // Expected: 0
+    }
+}
+
+// If you finish early:
+// - What should the method do if premiums is null?
+// - Can you write the same logic using LINQ?`
+    },
+
     'csharp-rest-api': {
       language: 'csharp',
       content: `// Third-party REST API integration (C#)
@@ -271,13 +314,25 @@ public async Task<List<Policy>> LoadPoliciesAsync(IEnumerable<int> ids)
       language: 'markdown',
       content: `# Junior .NET Interview — 55-minute plan
 
-## 1. Experience walkthrough (8 minutes)
+## 1. Very simple coding warm-up (5 minutes)
+Load: **C# — Very Simple Warm-up**
+
+Look for:
+- a working loop and condition
+- correct decimal total
+- ability to run and check the examples
+- clear explanation of basic choices
+
+This is an orientation exercise. Give help with the editor if needed and do not
+overweight small syntax mistakes.
+
+## 2. Experience walkthrough (8 minutes)
 - Describe the insurance document workflow you built.
 - What data went to the third-party API and what came back?
 - Tell me about a production failure you diagnosed personally.
 - What part did you implement yourself versus with team support?
 
-## 2. REST integration exercise (15 minutes)
+## 3. REST integration exercise (15 minutes)
 Load: **C# — Third-party REST API**
 
 Look for:
@@ -287,7 +342,7 @@ Look for:
 - secrets kept outside source code
 - reasonable retry/idempotency discussion
 
-## 3. SQL Server exercise (12 minutes)
+## 4. SQL Server exercise (12 minutes)
 Load: **SQL Server — Policy Query**
 
 Look for:
@@ -296,7 +351,7 @@ Look for:
 - parameterization, not string concatenation
 - practical index reasoning
 
-## 4. EF Core / LINQ exercise (10 minutes)
+## 5. EF Core / LINQ exercise (10 minutes)
 Load: **Entity Framework + LINQ**
 
 Look for:
@@ -304,7 +359,7 @@ Look for:
 - projection, paging, AsNoTracking
 - awareness that LINQ is translated to SQL
 
-## 5. Design discussion (7 minutes)
+## 6. Design discussion (7 minutes)
 Load: **SOLID — Refactoring**
 
 Look for:
@@ -312,7 +367,7 @@ Look for:
 - dependency injection and small interfaces
 - transaction/failure-boundary reasoning
 
-## 6. Candidate questions (3 minutes)
+## 7. Candidate questions (3 minutes)
 
 Calibration: this is a junior candidate. Prefer clear reasoning, safe defaults,
 and ability to learn over perfect framework syntax. Ask for clarification and
