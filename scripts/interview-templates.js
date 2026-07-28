@@ -531,13 +531,17 @@ A separate result array is completely correct. Its extra space is O(n).`
     },
 
     'dotnet-interview-plan': {
-      title: 'Simple .NET Interview Plan',
+      title: 'Your Junior .NET Interview',
       language: 'markdown',
-      content: `# Simple junior .NET interview plan
+      content: `# Welcome to your junior .NET interview
 
-Each coding question is intended to take about 5 minutes.
+You will work through seven short exercises. Each one is intended to take about
+five minutes. The goal is to understand how you approach a problem—not to test
+whether you have memorized every piece of syntax.
 
-1. C# — Very Simple Warm-up
+## What we will cover
+
+1. C# — Simple warm-up
 2. C# — Easy Running Sum
 3. SQL Server — Simple Join
 4. LINQ — Simple Filter
@@ -545,13 +549,17 @@ Each coding question is intended to take about 5 minutes.
 6. C# — REST API Basics
 7. SOLID — Single Responsibility
 
-Suggested approach:
-- Read the prompt aloud.
-- Let the candidate ask questions.
-- Give one small hint after about two minutes.
-- Ask them to run the runnable C# questions.
-- Use the interviewer-only Answer Key button for grading.
-- Small syntax mistakes matter less than understanding.`,
+## How to approach each exercise
+
+- Read the prompt carefully and ask questions if anything is unclear.
+- Talk through what you are thinking as you work.
+- Write the clearest solution you can; small syntax mistakes are okay.
+- You may write notes or pseudocode before writing the final code.
+- If you get stuck, say where you are stuck. The interviewer may offer a hint.
+- Explain your finished answer and how you would check that it works.
+
+It is completely okay to say that you do not remember something. Clear
+reasoning, honest communication, and learning from a hint are all valuable.`,
       answerKey: `OVERALL GRADING
 Each exercise has a 0–3 score in its own Answer Key.
 
