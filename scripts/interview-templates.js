@@ -460,44 +460,74 @@ reasoning matters more than memorizing the acronym.`
     },
 
     'csharp-debugging': {
-      title: 'C# Simple Debugging',
+      title: 'C# Easy — Running Sum',
       language: 'csharp',
-      content: `// 5-minute C# debugging question
+      content: `// 5-minute LeetCode-style Easy question
 //
-// This should return the average of 10 and 20, which is 15.
-// Find and fix the bug.
+// Given an array of integers, return its running sum.
+// Each result position contains the sum of all numbers up to that position.
+//
+// EXAMPLE
+// Input:    [1, 2, 3, 4]
+// Output:   [1, 3, 6, 10]
+//
+// Explanation:
+// result[0] = 1
+// result[1] = 1 + 2 = 3
+// result[2] = 1 + 2 + 3 = 6
+// result[3] = 1 + 2 + 3 + 4 = 10
+//
+// Complete RunningSum. You may modify and return the input array,
+// or create and return a new array.
 
 using System;
 
 public class Program
 {
-    public static int Average(int first, int second)
+    public static int[] RunningSum(int[] numbers)
     {
-        int total = first + second;
-        return total; // Bug is on this line.
+        // Write your loop here.
+        return numbers;
     }
 
     public static void Main()
     {
-        Console.WriteLine(Average(10, 20)); // Expected: 15
+        int[] result = RunningSum(new int[] { 1, 2, 3, 4 });
+        Console.WriteLine(string.Join(", ", result)); // Expected: 1, 3, 6, 10
     }
 }`,
       answerKey: `PLAIN-ENGLISH ANSWER
-The method returns the total (30), but an average is the total divided by the
-number of values (2).
+Walk through the array from left to right while remembering the total so far.
+Add the current number to that total, then store the total at the current
+position. For [1, 2, 3, 4], the remembered totals are 1, 3, 6, and 10.
 
-ONE GOOD FIX
-return total / 2;
+ONE GOOD SOLUTION
+public static int[] RunningSum(int[] numbers)
+{
+    int total = 0;
+
+    for (int i = 0; i < numbers.Length; i++)
+    {
+        total += numbers[i];
+        numbers[i] = total;
+    }
+
+    return numbers;
+}
 
 HOW TO GRADE (0–3)
-3 — Changes the return to total / 2 and gets 15.
-2 — Explains division is missing but makes a small syntax mistake.
-1 — Recognizes 30 is wrong but cannot state the average formula.
-0 — Cannot identify why the method returns 30.
+3 — Produces [1, 3, 6, 10] with one loop and returns the array.
+2 — Understands the running total but has a small indexing or syntax mistake.
+1 — Can calculate the example manually but cannot turn it into a loop.
+0 — Adds only neighboring values or returns the unchanged input.
 
 OPTIONAL FOLLOW-UP
-Ask what Average(10, 21) returns. With int it returns 15, not 15.5. A decimal
-or double return type would preserve the fractional part.`
+Ask for the time and space complexity:
+- Time is O(n) because every number is visited once.
+- Extra space is O(1) for this solution because it modifies the input array.
+
+ALSO ACCEPT
+A separate result array is completely correct. Its extra space is O(n).`
     },
 
     'dotnet-interview-plan': {
@@ -508,7 +538,7 @@ or double return type would preserve the fractional part.`
 Each coding question is intended to take about 5 minutes.
 
 1. C# — Very Simple Warm-up
-2. C# — Simple Debugging
+2. C# — Easy Running Sum
 3. SQL Server — Simple Join
 4. LINQ — Simple Filter
 5. ASP.NET MVC — Validation
