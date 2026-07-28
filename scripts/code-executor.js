@@ -64,11 +64,17 @@ const CodeExecutor = (function() {
           executionTime: 0
         };
       } else {
+        const messages = [result.error, result.details]
+          .filter(Boolean)
+          .filter((message, index, all) => all.indexOf(message) === index);
+
         return {
           success: false,
           output: '',
-          error: result.error || result.details || 'Execution failed',
-          exitCode: result.code || -1
+          error: messages.join('\n\n') || 'Execution failed',
+          exitCode: result.code ?? -1,
+          stage: result.stage || '',
+          serviceUnavailable: Boolean(result.serviceUnavailable)
         };
       }
     } catch (error) {

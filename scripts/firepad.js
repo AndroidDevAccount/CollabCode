@@ -797,6 +797,12 @@
     const code = editor.getValue();
     const input = document.getElementById('stdin-input').value;
 
+    // The answer key and output share the right side of the editor.
+    // Never leave the solution visible while running candidate code.
+    if (typeof window.closeInterviewAnswerKey === 'function') {
+      window.closeInterviewAnswerKey();
+    }
+
     // Check if language supports execution
     if (!CodeExecutor.isSupported(language)) {
       showOutput(`Language '${language}' does not support execution yet.`, 'error');
@@ -818,7 +824,12 @@
         }
         showOutput(output, 'success');
       } else {
-        showOutput(result.error || 'Execution failed', 'error');
+        const heading = result.serviceUnavailable
+          ? 'RUNNER UNAVAILABLE'
+          : result.stage === 'compile'
+            ? 'COMPILER ERROR'
+            : 'PROGRAM ERROR';
+        showOutput(`${heading}\n\n${result.error || 'Execution failed'}`, 'error');
       }
     } catch (error) {
       showOutput(`Error: ${error.message}`, 'error');

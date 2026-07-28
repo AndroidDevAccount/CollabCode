@@ -70,32 +70,56 @@ module.exports = async function handler(req, res) {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error('Piston API error:', error);
-      return res.status(response.status).json({ 
-        error: 'Code execution failed',
-        details: error 
+      const details = await response.text();
+      console.error('Piston API error:', details);
+      return res.status(503).json({
+        error: 'The code runner is currently unavailable.',
+        details: details || `Execution provider returned HTTP ${response.status}.`,
+        serviceUnavailable: true
       });
     }
 
     const result = await response.json();
+    const compileOutput = result.compile?.output || result.compile?.stderr || '';
+    const runOutput = result.run?.output || '';
+    const runStderr = result.run?.stderr || '';
+
+    if (result.compile && result.compile.code !== 0) {
+      return res.status(200).json({
+        success: false,
+        error: compileOutput || 'Compilation failed without an error message.',
+        stage: 'compile',
+        code: result.compile.code
+      });
+    }
+
+    if (result.run && result.run.code !== 0) {
+      return res.status(200).json({
+        success: false,
+        error: runOutput || runStderr || 'The program exited with an error.',
+        stage: 'run',
+        code: result.run.code,
+        signal: result.run.signal
+      });
+    }
 
     // Return execution result
     return res.status(200).json({
       success: true,
-      output: result.run?.output || '',
+      output: runOutput,
       stdout: result.run?.stdout || '',
-      stderr: result.run?.stderr || '',
+      stderr: runStderr,
       code: result.run?.code,
       signal: result.run?.signal,
-      compile_output: result.compile?.output || ''
+      compile_output: compileOutput
     });
 
   } catch (error) {
     console.error('Error executing code:', error);
-    return res.status(500).json({ 
-      error: 'Internal server error',
-      details: error.message 
+    return res.status(503).json({
+      error: 'The code runner is currently unavailable.',
+      details: error.message,
+      serviceUnavailable: true
     });
   }
 }
