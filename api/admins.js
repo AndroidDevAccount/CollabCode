@@ -47,6 +47,7 @@ module.exports = async function handler(req, res) {
       return res.status(503).json({ error: 'Admin storage is not configured' });
     }
     const adminsRef = admin.database().ref('adminAccounts');
+    const ownerEmail = String(process.env.ADMIN_EMAIL || '').trim().toLowerCase();
 
     if (req.method === 'GET') {
       const snapshot = await adminsRef.once('value');
@@ -57,13 +58,12 @@ module.exports = async function handler(req, res) {
         disabled: account.disabled === true,
         owner: false
       }));
-      const owner = process.env.ADMIN_EMAIL
-        ? [{ email: process.env.ADMIN_EMAIL, owner: true }]
+      const owner = ownerEmail
+        ? [{ email: ownerEmail, owner: true }]
         : [];
       return res.status(200).json({ admins: [...owner, ...additionalAdmins] });
     }
 
-    const ownerEmail = String(process.env.ADMIN_EMAIL || '').trim().toLowerCase();
     if (!ownerEmail || String(currentAdmin.email || '').trim().toLowerCase() !== ownerEmail) {
       return res.status(403).json({ error: 'Only the configured owner can create admins' });
     }
@@ -77,22 +77,25 @@ module.exports = async function handler(req, res) {
     if (password.length < 8) {
       return res.status(400).json({ error: 'Password must be at least 8 characters' });
     }
-    if (email === String(process.env.ADMIN_EMAIL || '').toLowerCase()) {
+    if (email === ownerEmail) {
       return res.status(409).json({ error: 'That admin already exists' });
     }
 
     const accountRef = adminsRef.child(emailKey(email));
-    if ((await accountRef.once('value')).exists()) {
-      return res.status(409).json({ error: 'That admin already exists' });
-    }
-
-    await accountRef.set({
+    const account = {
       email,
       passwordHash: await bcrypt.hash(password, 12),
       createdAt: Date.now(),
       createdBy: currentAdmin.email,
       disabled: false
+    };
+    const result = await accountRef.transaction(currentValue => {
+      if (currentValue !== null) return;
+      return account;
     });
+    if (!result.committed) {
+      return res.status(409).json({ error: 'That admin already exists' });
+    }
 
     return res.status(201).json({ success: true, admin: { email, owner: false } });
   } catch (error) {
