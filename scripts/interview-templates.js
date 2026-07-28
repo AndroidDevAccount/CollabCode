@@ -52,30 +52,69 @@ Do not penalize formatting or whether they use foreach, for, or LINQ.`
     },
 
     'csharp-rest-api': {
-      title: 'C# REST API Basics',
+      title: 'C# Public REST API Test',
       language: 'csharp',
       content: `// 5-minute REST API question
 //
-// Complete GetPolicyAsync.
-// It should GET "api/policies/42", reject an unsuccessful response,
-// and return the response body as text.
+// We are using JSONPlaceholder, a free API made for testing.
+//
+// Documentation:
+// https://jsonplaceholder.typicode.com/
+//
+// Request:
+// GET https://jsonplaceholder.typicode.com/todos/1
+//
+// Expected response shape:
+// {
+//   "userId": 1,
+//   "id": 1,
+//   "title": "delectus aut autem",
+//   "completed": false
+// }
+//
+// Task: Complete GetTodoAsync using exactly these steps:
+// 1. Send a GET request to "todos/1".
+// 2. Throw an error if the response is not successful.
+// 3. Read and return the response body as text.
+//
+// Before coding, open this URL in a browser to confirm the API is available:
+// https://jsonplaceholder.typicode.com/todos/1
+//
+// The interview editor's hosted C# runner might not allow outbound HTTP.
+// Grade the method itself and ask the candidate to explain each line.
 
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-public class PolicyClient
+public class TodoClient
 {
     private readonly HttpClient _client;
 
-    public PolicyClient(HttpClient client)
+    public TodoClient(HttpClient client)
     {
         _client = client;
     }
 
-    public async Task<string> GetPolicyAsync()
+    public async Task<string> GetTodoAsync()
     {
         // Write 3 lines here.
         return "";
+    }
+}
+
+public class Program
+{
+    public static async Task Main()
+    {
+        using var httpClient = new HttpClient
+        {
+            BaseAddress = new Uri("https://jsonplaceholder.typicode.com/")
+        };
+
+        var todoClient = new TodoClient(httpClient);
+        string json = await todoClient.GetTodoAsync();
+        Console.WriteLine(json);
     }
 }`,
       answerKey: `PLAIN-ENGLISH ANSWER
@@ -83,12 +122,23 @@ Use the provided HttpClient to send a GET request. Check that the server
 returned success. Then read and return the response text.
 
 ONE GOOD SOLUTION
-var response = await _client.GetAsync("api/policies/42");
+var response = await _client.GetAsync("todos/1");
 response.EnsureSuccessStatusCode();
 return await response.Content.ReadAsStringAsync();
 
+WHAT EACH LINE DOES
+1. GetAsync sends an HTTP GET and waits for the real server response.
+2. EnsureSuccessStatusCode throws if the server returns 4xx or 5xx.
+3. ReadAsStringAsync reads the JSON response body into a string.
+
+EXPECTED RESULT
+Opening the endpoint in a browser should show JSON containing:
+- "id": 1
+- "title": "delectus aut autem"
+- "completed": false
+
 HOW TO GRADE (0–3)
-3 — Uses await, the injected _client, checks success, and returns the body.
+3 — Writes all three lines correctly and can explain request, status, and body.
 2 — Gets and returns the response but misses the status check or needs a hint.
 1 — Knows an HTTP GET is needed but cannot form the method.
 0 — Creates unrelated code or cannot explain request versus response.
@@ -96,7 +146,8 @@ HOW TO GRADE (0–3)
 BONUS DISCUSSION (do not require)
 - API keys belong in configuration, not source code.
 - Production code should accept a CancellationToken.
-- JSON would normally be deserialized into a C# model.`
+- JSON would normally be deserialized into a C# Todo model.
+- HttpClient should usually be injected rather than recreated per request.`
     },
 
     'aspnet-mvc': {
