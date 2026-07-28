@@ -46,6 +46,7 @@ coverage/
 # Production builds
 dist/
 build/
+public/
 
 # Temporary files
 tmp/
