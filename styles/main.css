@@ -920,7 +920,18 @@ html, body {
 }
 
 #firepad-container.with-answer-key {
-  margin-right: 46%;
+  margin-right: max(46%, 420px);
+}
+
+@media (max-width: 720px) {
+  #answer-key-panel {
+    width: 100%;
+    min-width: 0;
+  }
+
+  #firepad-container.with-answer-key {
+    margin-right: 0;
+  }
 }
 
 .answer-key-content {

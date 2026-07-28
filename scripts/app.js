@@ -481,6 +481,7 @@
     // Logout
     adminLogoutBtn.addEventListener('click', function() {
       Auth.logout();
+      localStorage.removeItem('recent_admin_session');
       document.getElementById('adminDashboardModal').style.display = 'none';
       document.getElementById('landingModal').style.display = 'flex';
       document.getElementById('activeSession').style.display = 'none';
