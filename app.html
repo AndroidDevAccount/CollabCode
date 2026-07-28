@@ -22,7 +22,7 @@
 
     <!-- styling -->
     <!-- Custom style -->
-    <link rel="stylesheet" href="styles/main.css?v=6">
+    <link rel="stylesheet" href="styles/main.css?v=7">
     <!-- Firepad -->
     <link rel="stylesheet" href="https://cdn.firebase.com/libs/firepad/1.4.0/firepad.css" />
 
@@ -588,14 +588,12 @@
           <details id="interview-tools-menu" style="display: none;">
             <summary>Interview Tools</summary>
             <div class="interview-tools-popover">
-              <label>Questions</label>
+              <div class="interview-tools-heading">Included Questions</div>
               <select id="template-selector" title="Load Interview Question" style="display: none;">
-                <option value="">Load Questions…</option>
+                <option value="">Choose a question…</option>
               </select>
-              <div class="interview-menu-actions">
-                <button id="import-question-set-btn" type="button" style="display: none;">Import Set</button>
-                <button id="answer-key-btn" type="button" style="display: none;" disabled>Answer Key</button>
-              </div>
+              <div class="interview-tools-heading custom-questions-heading">Custom Questions</div>
+              <button id="import-question-set-btn" type="button" class="custom-questions-button" style="display: none;">Add Questions from File</button>
               <input id="question-set-file-input" type="file" accept=".json,application/json" hidden>
               <label>Editor theme</label>
               <select id="theme-selector">
@@ -616,7 +614,6 @@
                 <option value="18">18px</option>
                 <option value="20">20px</option>
               </select>
-              <button id="dashboard-btn" type="button" class="interview-menu-dashboard" style="display: none;">Open Dashboard</button>
             </div>
           </details>
         </div>
@@ -631,6 +628,8 @@
         <div class="right-controls">
           <div id="users-list"></div>
           <button id="notes-toggle-btn" class="notes-button" style="display: none;">📝 Notes</button>
+          <button id="answer-key-btn" type="button" class="notes-button" style="display: none;" disabled>Answer Key</button>
+          <button id="dashboard-btn" type="button" class="notes-button" style="display: none;">Dashboard</button>
           <button id="run-btn" class="run-button" hidden>▶ Run</button>
           <button id="share-btn">Share</button>
         </div>
@@ -760,7 +759,7 @@
     <!-- Simple Templates (must load before firepad.js) -->
     <script src="scripts/simple-templates.js?v=2"></script>
     <script src="scripts/custom-dialogs.js?v=2"></script>
-    <script src="scripts/firepad.js?v=10"></script>
+    <script src="scripts/firepad.js?v=11"></script>
     <script src="scripts/interview-notes.js?v=4"></script>
     <script src="scripts/slack-integration.js?v=4"></script>
     <script src="scripts/posthog-tracking.js?v=2"></script>

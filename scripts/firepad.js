@@ -495,7 +495,10 @@
     function closeAnswerKeyPanel() {
       if (answerKeyPanel) answerKeyPanel.style.display = 'none';
       if (firepadContainer) firepadContainer.classList.remove('with-answer-key');
-      if (answerKeyButton) answerKeyButton.textContent = 'Answer Key';
+      if (answerKeyButton) {
+        answerKeyButton.textContent = 'Answer Key';
+        answerKeyButton.classList.remove('active');
+      }
       if (editor) editor.resize();
     }
 
@@ -515,7 +518,10 @@
       }
 
       answerKeyPanel.style.display = 'flex';
-      if (answerKeyButton) answerKeyButton.textContent = 'Hide Answer Key';
+      if (answerKeyButton) {
+        answerKeyButton.textContent = 'Hide Answer Key';
+        answerKeyButton.classList.add('active');
+      }
       if (editor) editor.resize();
     }
 
@@ -602,7 +608,7 @@
         }
 
         function renderQuestionOptions() {
-          templateSelector.replaceChildren(new Option('Load Questions…', ''));
+          templateSelector.replaceChildren(new Option('Choose a question…', ''));
           Object.values(questionSets).forEach(set => {
             const group = document.createElement('optgroup');
             group.label = set.custom ? `My Set — ${set.title}` : set.title;
