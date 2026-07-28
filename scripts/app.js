@@ -1835,6 +1835,17 @@
       return;
     }
 
+    // Always initialize activity monitoring here as well as in the join flow.
+    // This restores the interviewer indicator when an active session is resumed
+    // after a refresh. The monitor ignores duplicate initialization.
+    if (window.initActivityMonitor) {
+      window.initActivityMonitor(
+        sessionCode,
+        userName,
+        Auth.isAdmin() ? 'interviewer' : 'candidate'
+      );
+    }
+
     // Initialize the editor session
     if (typeof initializeSession === 'function') {
       initializeSession({

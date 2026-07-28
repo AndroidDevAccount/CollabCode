@@ -6,6 +6,7 @@
   let sessionCode = null;
   let userId = null;
   let userType = null;
+  let initializedFor = null;
   
   // Idle detection state (moved to module scope)
   let isIdle = false;
@@ -24,6 +25,9 @@
   
   // Initialize monitoring
   window.initActivityMonitor = function(session, user, type) {
+    const initializationKey = `${session}:${type}`;
+    if (initializedFor === initializationKey) return;
+    initializedFor = initializationKey;
     sessionCode = session;
     userId = user;
     userType = type;
@@ -43,6 +47,15 @@
     // For interviewers, just listen to activity updates from Firebase
     else if (type === 'interviewer') {
       console.log('Activity monitoring in observer mode for interviewer');
+      if (window.updateActivityDashboard) {
+        window.updateActivityDashboard({
+          activityScore: 100,
+          tabSwitches: 0,
+          idlePeriods: 0,
+          suspiciousPatterns: 0,
+          sessionDurationMinutes: 0
+        });
+      }
       listenToActivityUpdates();
     }
   };
