@@ -1,5 +1,5 @@
 // Check for duplicate/multiple logins from different IPs
-import crypto from 'crypto';
+const crypto = require('crypto');
 
 // Simple in-memory store for active sessions (in production, use Redis or Firebase)
 const activeSessions = new Map();
@@ -18,7 +18,7 @@ function hashIP(ip) {
   return crypto.createHash('sha256').update(ip + process.env.JWT_SECRET).digest('hex').substring(0, 16);
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');

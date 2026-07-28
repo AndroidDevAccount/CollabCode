@@ -1,6 +1,6 @@
 // API endpoint to send Slack notifications
 // SECURITY: Webhook URL should be stored as environment variable, not sent from client
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });

@@ -1,9 +1,9 @@
 // Comprehensive session tracking API
 // Tracks IP, location, device info, VPN detection, and multiple login attempts
 
-import geoip from 'geoip-lite';
-import UAParser from 'ua-parser-js';
-import crypto from 'crypto';
+const geoip = require('geoip-lite');
+const UAParser = require('ua-parser-js');
+const crypto = require('crypto');
 
 // VPN/Proxy detection based on common patterns
 const VPN_INDICATORS = {
@@ -121,7 +121,7 @@ function getAllIPs(req) {
   return Array.from(ips).filter(ip => ip && ip !== '::1' && ip !== '127.0.0.1');
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
