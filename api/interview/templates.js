@@ -76,6 +76,7 @@ module.exports = async function handler(req, res) {
       const name = String(body?.name || '').trim();
       const description = String(body?.description || '').trim();
       const questions = body?.questions;
+      const importedId = typeof body?.id === 'string' ? body.id.trim() : '';
 
       if (!name || name.length > 120) {
         return res.status(400).json({ error: 'Question set name is required (120 characters maximum)' });
@@ -104,28 +105,61 @@ module.exports = async function handler(req, res) {
         return { title, language, content, answerKey };
       });
 
-      const setId = `custom-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-      await admin.database().ref(`customQuestionSets/${setId}`).set({
+      const validImportedId = /^[A-Za-z0-9_-]{1,80}$/.test(importedId);
+      const setId = validImportedId
+        ? (importedId.startsWith('custom-') ? importedId : `custom-${importedId}`)
+        : `custom-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      const storedSet = {
         name,
         description: description.slice(0, 300),
         questions: normalizedQuestions,
         createdAt: Date.now(),
         createdBy: decoded.email
+      };
+      await admin.database().ref().update({
+        [`customQuestionSets/${setId}`]: storedSet,
+        [`customQuestionSetMetadata/${setId}`]: {
+          name: storedSet.name,
+          description: storedSet.description,
+          questionCount: normalizedQuestions.length,
+          createdAt: storedSet.createdAt,
+          createdBy: storedSet.createdBy
+        }
       });
       return res.status(201).json({ success: true, setId });
     }
 
-    const customSnapshot = await admin.database().ref('customQuestionSets').once('value');
-    const customSets = customSnapshot.val() || {};
+    const metadataRef = admin.database().ref('customQuestionSetMetadata');
+    let metadataSnapshot = await metadataRef.once('value');
+    let customSetMetadata = metadataSnapshot.val() || {};
+
+    // Backfill metadata for sets saved before the lightweight index existed.
+    if (!metadataSnapshot.exists()) {
+      const legacySnapshot = await admin.database().ref('customQuestionSets').once('value');
+      const legacySets = legacySnapshot.val() || {};
+      customSetMetadata = Object.fromEntries(
+        Object.entries(legacySets).map(([setId, set]) => [setId, {
+          name: set.name,
+          description: set.description || '',
+          questionCount: Object.keys(set.questions || {}).length,
+          createdAt: set.createdAt,
+          createdBy: set.createdBy
+        }])
+      );
+      if (Object.keys(customSetMetadata).length) {
+        await metadataRef.set(customSetMetadata);
+      }
+    }
+
     const responseTemplates = { ...templates };
     const responseQuestionSets = { ...questionSets };
+    const requestedSetId = String(req.query?.setId || '');
 
-    Object.entries(customSets).forEach(([setId, set]) => {
-      const questionKeys = Object.values(set.questions || {}).map((question, index) => {
-        const questionKey = `${setId}:${index}`;
-        responseTemplates[questionKey] = question;
-        return questionKey;
-      });
+    Object.entries(customSetMetadata).forEach(([setId, set]) => {
+      const questionKeys = Array.from(
+        { length: Number(set.questionCount) || 0 },
+        (_, index) => `${setId}:${index}`
+      );
       responseQuestionSets[setId] = {
         title: set.name,
         description: set.description || '',
@@ -133,6 +167,16 @@ module.exports = async function handler(req, res) {
         custom: true
       };
     });
+
+    if (requestedSetId && responseQuestionSets[requestedSetId]?.custom) {
+      const selectedSnapshot = await admin.database()
+        .ref(`customQuestionSets/${requestedSetId}`)
+        .once('value');
+      const selectedSet = selectedSnapshot.val();
+      Object.values(selectedSet?.questions || {}).forEach((question, index) => {
+        responseTemplates[`${requestedSetId}:${index}`] = question;
+      });
+    }
 
     return res.status(200).json({
       templates: responseTemplates,

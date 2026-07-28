@@ -2,7 +2,7 @@
 
 Administrators use the **Interview Questions** dropdown in the editor toolbar.
 Included questions are grouped by their built-in set. The **Custom Questions**
-group contains imported questions and an **Add questions from file…** option for
+group contains imported questions and a **Load custom questions from file…** option for
 loading another JSON file.
 
 An imported file has this shape:

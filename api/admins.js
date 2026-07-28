@@ -54,12 +54,18 @@ module.exports = async function handler(req, res) {
         email: account.email,
         createdAt: account.createdAt,
         createdBy: account.createdBy,
+        disabled: account.disabled === true,
         owner: false
       }));
       const owner = process.env.ADMIN_EMAIL
         ? [{ email: process.env.ADMIN_EMAIL, owner: true }]
         : [];
       return res.status(200).json({ admins: [...owner, ...additionalAdmins] });
+    }
+
+    const ownerEmail = String(process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+    if (!ownerEmail || String(currentAdmin.email || '').trim().toLowerCase() !== ownerEmail) {
+      return res.status(403).json({ error: 'Only the configured owner can create admins' });
     }
 
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;

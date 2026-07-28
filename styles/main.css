@@ -2393,6 +2393,7 @@ a.powered-by-firepad {
 
 /* Modern Dashboard Redesign */
 .dashboard-page {
+  display: flex;
   position: fixed;
   inset: 0;
   z-index: 1000;

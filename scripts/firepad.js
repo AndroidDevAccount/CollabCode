@@ -14,6 +14,8 @@
   let firepadReady = false;
   let activeInterviewTemplateKey = null;
   let currentSessionIsNew = false;
+  let usersMenuButtonClickHandler = null;
+  let usersMenuOutsideClickHandler = null;
   
   // Session termination modal HTML
   const terminationModalHTML = `
@@ -136,6 +138,19 @@
     } catch (error) {
       console.warn('Session cleanup warning:', error);
     }
+
+    const userCountButton = document.getElementById('user-count');
+    if (userCountButton) {
+      if (usersMenuButtonClickHandler) {
+        userCountButton.removeEventListener('click', usersMenuButtonClickHandler);
+      }
+      delete userCountButton.dataset.menuBound;
+    }
+    if (usersMenuOutsideClickHandler) {
+      document.removeEventListener('click', usersMenuOutsideClickHandler);
+    }
+    usersMenuButtonClickHandler = null;
+    usersMenuOutsideClickHandler = null;
 
     firepad = null;
     firepadRef = null;
@@ -467,16 +482,18 @@
     const userCountButton = document.getElementById('user-count');
     if (userCountButton && !userCountButton.dataset.menuBound) {
       userCountButton.dataset.menuBound = 'true';
-      userCountButton.addEventListener('click', function() {
+      usersMenuButtonClickHandler = function() {
         usersList.hidden = !usersList.hidden;
-        this.setAttribute('aria-expanded', String(!usersList.hidden));
-      });
-      document.addEventListener('click', function(event) {
+        userCountButton.setAttribute('aria-expanded', String(!usersList.hidden));
+      };
+      usersMenuOutsideClickHandler = function(event) {
         if (!event.target.closest('.connected-users-control')) {
           usersList.hidden = true;
           userCountButton.setAttribute('aria-expanded', 'false');
         }
-      });
+      };
+      userCountButton.addEventListener('click', usersMenuButtonClickHandler);
+      document.addEventListener('click', usersMenuOutsideClickHandler);
     }
   }
 
@@ -689,8 +706,9 @@
           templateSelector.style.display = 'inline-block';
         }
 
-        async function loadQuestionSetData() {
-          const response = await fetch('/api/interview/templates', {
+        async function loadQuestionSetData(setId = '') {
+          const query = setId ? `?setId=${encodeURIComponent(setId)}` : '';
+          const response = await fetch(`/api/interview/templates${query}`, {
             method: 'GET',
             headers: Auth.getAuthHeaders()
           });
@@ -713,12 +731,21 @@
           activeQuestionSetKey = questionSets[savedSetKey] ? savedSetKey : null;
           if (activeQuestionSetKey &&
               questionSets[activeQuestionSetKey].questions.includes(savedQuestionKey)) {
+            if (questionSets[activeQuestionSetKey].custom) {
+              await loadQuestionSetData(activeQuestionSetKey);
+            }
             activeInterviewTemplateKey = savedQuestionKey;
           }
           if (activeQuestionSetKey && !activeInterviewTemplateKey) {
             const firstQuestion = questionSets[activeQuestionSetKey].questions[0];
-            if (firstQuestion) {
-              loadInterviewTemplate(firstQuestion, { skipConfirm: currentSessionIsNew });
+            const existing = editor ? editor.getValue().trim() : '';
+            if (firstQuestion && !existing) {
+              if (questionSets[activeQuestionSetKey].custom) {
+                await loadQuestionSetData(activeQuestionSetKey);
+              }
+              loadInterviewTemplate(firstQuestion, { skipConfirm: true });
+            } else if (existing) {
+              activeQuestionSetKey = null;
             }
           }
           if (activeQuestionSetKey) renderLoadedQuestions();
@@ -750,7 +777,7 @@
               if (!response.ok || !data.setId) {
                 throw new Error(data.error || 'Unable to save custom questions');
               }
-              await loadQuestionSetData();
+              await loadQuestionSetData(data.setId);
               activeQuestionSetKey = data.setId;
               activeInterviewTemplateKey = null;
               await settingsRef.update({
@@ -793,17 +820,19 @@
           openAnswerKeyPanel(template);
         }
 
-        templateSelector.addEventListener('change', function() {
+        templateSelector.addEventListener('change', async function() {
           if (this.value === '__add_custom__') {
             this.value = activeInterviewTemplateKey || '';
-            questionSetFileInput.value = '';
-            questionSetFileInput.click();
+            if (questionSetFileInput) {
+              questionSetFileInput.value = '';
+              questionSetFileInput.click();
+            }
             return;
           }
           if (this.value === '__change_set__') {
             activeQuestionSetKey = null;
             activeInterviewTemplateKey = null;
-            answerKeyButton.disabled = true;
+            if (answerKeyButton) answerKeyButton.disabled = true;
             closeAnswerKeyPanel();
             settingsRef.update({
               questionSet: null,
@@ -814,8 +843,11 @@
           }
           if (questionSets[this.value]) {
             activeQuestionSetKey = this.value;
+            if (questionSets[activeQuestionSetKey].custom) {
+              await loadQuestionSetData(activeQuestionSetKey);
+            }
             activeInterviewTemplateKey = null;
-            answerKeyButton.disabled = true;
+            if (answerKeyButton) answerKeyButton.disabled = true;
             closeAnswerKeyPanel();
             settingsRef.update({
               questionSet: activeQuestionSetKey,
@@ -834,7 +866,7 @@
             const template = window.InterviewTemplates?.[activeInterviewTemplateKey];
             if (!template?.answerKey) return;
 
-            if (getComputedStyle(answerKeyPanel).display === 'none') {
+            if (!answerKeyPanel || getComputedStyle(answerKeyPanel).display === 'none') {
               openAnswerKeyPanel(template);
             } else {
               closeAnswerKeyPanel();
