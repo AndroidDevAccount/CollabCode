@@ -782,7 +782,9 @@ Update only the CSS to:
 5. Make the paragraphs Arial with normal font weight.
 6. Give the button a blue background, white text, 10px vertical and 16px
    horizontal padding, no border, and bold Arial text.
-7. On screens 480px wide or smaller, make the button fill the card width.
+7. Use an @media rule so that, when the screen is 480px wide or smaller, the
+   policy card becomes 200px wide.
+Bonus: In that same @media rule, make the button fill the card width.
 -->
 
 <style>
@@ -811,7 +813,7 @@ Update only the CSS to:
       answerKey: `PLAIN-ENGLISH ANSWER
 width sets the card's width. Padding adds space between the content and the
 border. The h2 and p selectors style those element types inside the card. The
-media query changes the button only on small screens.
+media query applies different styles when the screen is 480px wide or smaller.
 
 ONE GOOD SOLUTION
 .policy-card {
@@ -842,6 +844,10 @@ ONE GOOD SOLUTION
 }
 
 @media (max-width: 480px) {
+    .policy-card {
+        width: 200px;
+    }
+
     .details-button {
         width: 100%;
     }
@@ -849,7 +855,7 @@ ONE GOOD SOLUTION
 
 HOW TO GRADE (0-3)
 3 — Adds the card layout, requested heading and paragraph typography, button
-    styling, and the mobile button rule.
+    styling, and the 480px media rule that changes the card width to 200px.
 2 — Completes most changes but misses one detail or makes a minor syntax error.
 1 — Can add one or two basic properties but needs substantial help with the
     selectors or remaining styles.
@@ -860,6 +866,7 @@ ACCEPTABLE VARIATIONS
 - A reasonable blue such as #0066cc, royalblue, or Bootstrap blue is fine.
 - A close breakpoint such as 500px is fine if the candidate explains it.
 - Equivalent selectors and reasonable pixel/rem values are fine.
+- The full-width mobile button is a bonus and should not affect the main score.
 
 OPTIONAL FOLLOW-UP
 Ask the candidate to explain the difference between margin and padding:
