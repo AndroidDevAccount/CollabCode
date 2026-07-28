@@ -99,7 +99,6 @@
     // Update UI based on role
     const endSessionBtn = document.getElementById('end-session-btn');
     const dashboardBtn = document.getElementById('dashboard-btn');
-    const interviewToolsMenu = document.getElementById('interview-tools-menu');
     
     if (isAdmin) {
       console.log('Admin user detected - showing End Interview button');
@@ -113,7 +112,6 @@
         console.log('End Interview button is visible for admin');
       }
       if (dashboardBtn) dashboardBtn.style.display = 'inline-block';
-      if (interviewToolsMenu) interviewToolsMenu.style.display = 'block';
     } else {
       console.log('Non-admin user - hiding End Interview button');
       // Hide button for non-admin users
@@ -121,7 +119,6 @@
         endSessionBtn.style.display = 'none';
       }
       if (dashboardBtn) dashboardBtn.style.display = 'none';
-      if (interviewToolsMenu) interviewToolsMenu.style.display = 'none';
     }
   }
 
@@ -512,7 +509,6 @@
 
     // Interview question templates (interviewer only)
     const templateSelector = document.getElementById('template-selector');
-    const importQuestionSetButton = document.getElementById('import-question-set-btn');
     const questionSetFileInput = document.getElementById('question-set-file-input');
     const answerKeyButton = document.getElementById('answer-key-btn');
     const answerKeyPanel = document.getElementById('answer-key-panel');
@@ -555,7 +551,6 @@
     if (templateSelector) {
       if (!currentUser || !currentUser.isAdmin) {
         templateSelector.style.display = 'none';
-        if (importQuestionSetButton) importQuestionSetButton.style.display = 'none';
         if (answerKeyButton) answerKeyButton.style.display = 'none';
         closeAnswerKeyPanel();
       } else {
@@ -634,10 +629,11 @@
         }
 
         function renderQuestionOptions() {
-          templateSelector.replaceChildren(new Option('Choose a question…', ''));
-          Object.values(questionSets).forEach(set => {
+          const previouslySelected = activeInterviewTemplateKey || '';
+          templateSelector.replaceChildren(new Option('Interview Questions', ''));
+          Object.values(questionSets).filter(set => !set.custom).forEach(set => {
             const group = document.createElement('optgroup');
-            group.label = set.custom ? `My Set — ${set.title}` : set.title;
+            group.label = set.title;
             set.questions.forEach(questionKey => {
               const template = window.InterviewTemplates[questionKey];
               if (!template) return;
@@ -645,6 +641,21 @@
             });
             if (group.children.length > 0) templateSelector.appendChild(group);
           });
+
+          const customGroup = document.createElement('optgroup');
+          customGroup.label = 'Custom Questions';
+          Object.values(questionSets).filter(set => set.custom).forEach(set => {
+            set.questions.forEach(questionKey => {
+              const template = window.InterviewTemplates[questionKey];
+              if (!template) return;
+              customGroup.appendChild(
+                new Option(`${set.title} — ${template.title}`, questionKey)
+              );
+            });
+          });
+          customGroup.appendChild(new Option('Add questions from file…', '__add_custom__'));
+          templateSelector.appendChild(customGroup);
+          templateSelector.value = previouslySelected;
           templateSelector.style.display = 'inline-block';
         }
 
@@ -675,12 +686,7 @@
           return;
         }
 
-        if (importQuestionSetButton && questionSetFileInput) {
-          importQuestionSetButton.style.display = 'inline-block';
-          importQuestionSetButton.addEventListener('click', function() {
-            questionSetFileInput.value = '';
-            questionSetFileInput.click();
-          });
+        if (questionSetFileInput) {
           questionSetFileInput.addEventListener('change', async function() {
             const file = this.files?.[0];
             if (!file) return;
@@ -718,9 +724,13 @@
         }
 
         templateSelector.addEventListener('change', function() {
+          if (this.value === '__add_custom__') {
+            this.value = activeInterviewTemplateKey || '';
+            questionSetFileInput.value = '';
+            questionSetFileInput.click();
+            return;
+          }
           loadInterviewTemplate(this.value);
-          this.value = '';
-          document.getElementById('interview-tools-menu')?.removeAttribute('open');
         });
 
         if (answerKeyButton) {
@@ -733,7 +743,6 @@
             } else {
               closeAnswerKeyPanel();
             }
-            document.getElementById('interview-tools-menu')?.removeAttribute('open');
           });
         }
 

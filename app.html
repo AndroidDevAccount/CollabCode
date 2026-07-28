@@ -22,7 +22,7 @@
 
     <!-- styling -->
     <!-- Custom style -->
-    <link rel="stylesheet" href="styles/main.css?v=9">
+    <link rel="stylesheet" href="styles/main.css?v=10">
     <!-- Firepad -->
     <link rel="stylesheet" href="https://cdn.firebase.com/libs/firepad/1.4.0/firepad.css" />
 
@@ -582,37 +582,29 @@
             </optgroup>
           </select>
 
-          <details id="interview-tools-menu" style="display: none;">
-            <summary>Interview Tools</summary>
-            <div class="interview-tools-popover">
-              <div class="interview-tools-heading">Included Questions</div>
-              <select id="template-selector" title="Load Interview Question" style="display: none;">
-                <option value="">Choose a question…</option>
-              </select>
-              <div class="interview-tools-heading custom-questions-heading">Custom Questions</div>
-              <button id="import-question-set-btn" type="button" class="custom-questions-button" style="display: none;">Add Questions from File</button>
-              <input id="question-set-file-input" type="file" accept=".json,application/json" hidden>
-              <label>Editor theme</label>
-              <select id="theme-selector">
-                <option value="monokai">Monokai</option>
-                <option value="github">GitHub</option>
-                <option value="tomorrow">Tomorrow</option>
-                <option value="twilight">Twilight</option>
-                <option value="solarized_dark">Solarized Dark</option>
-                <option value="solarized_light">Solarized Light</option>
-                <option value="textmate">TextMate</option>
-                <option value="terminal">Terminal</option>
-              </select>
-              <label>Font size</label>
-              <select id="fontSize-selector">
-                <option value="12">12px</option>
-                <option value="14" selected>14px</option>
-                <option value="16">16px</option>
-                <option value="18">18px</option>
-                <option value="20">20px</option>
-              </select>
-            </div>
-          </details>
+          <select id="template-selector" title="Load Interview Question" style="display: none;">
+            <option value="">Interview Questions</option>
+          </select>
+          <input id="question-set-file-input" type="file" accept=".json,application/json" hidden>
+
+          <select id="theme-selector">
+            <option value="monokai">Monokai</option>
+            <option value="github">GitHub</option>
+            <option value="tomorrow">Tomorrow</option>
+            <option value="twilight">Twilight</option>
+            <option value="solarized_dark">Solarized Dark</option>
+            <option value="solarized_light">Solarized Light</option>
+            <option value="textmate">TextMate</option>
+            <option value="terminal">Terminal</option>
+          </select>
+
+          <select id="fontSize-selector">
+            <option value="12">12px</option>
+            <option value="14" selected>14px</option>
+            <option value="16">16px</option>
+            <option value="18">18px</option>
+            <option value="20">20px</option>
+          </select>
         </div>
 
         <div class="center-info">
@@ -756,7 +748,7 @@
     <!-- Simple Templates (must load before firepad.js) -->
     <script src="scripts/simple-templates.js?v=2"></script>
     <script src="scripts/custom-dialogs.js?v=2"></script>
-    <script src="scripts/firepad.js?v=13"></script>
+    <script src="scripts/firepad.js?v=14"></script>
     <script src="scripts/interview-notes.js?v=4"></script>
     <script src="scripts/slack-integration.js?v=4"></script>
     <script src="scripts/posthog-tracking.js?v=2"></script>
