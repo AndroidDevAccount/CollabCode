@@ -47,7 +47,8 @@
   "services": {
     "opencollab": {
       "root": ".",
-      "buildCommand": "npm install"
+      "buildCommand": "npm install",
+      "entrypoint": "server.js"
     }
   },
   "rewrites": [
