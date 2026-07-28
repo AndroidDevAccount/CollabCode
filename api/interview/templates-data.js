@@ -2,53 +2,92 @@
 
 module.exports = {
     'csharp-warmup': {
-      title: 'C# Warm-up — Annual Premium',
+      title: 'C# Warm-up — Discounted Premiums',
       language: 'csharp',
       content: `// 5-minute C# warm-up
 //
 // We are starting a small insurance application.
 //
-// Complete CalculateAnnualPremium.
-// A policy costs the same amount each month, so multiply the monthly
-// premium by 12 and return the result.
+// A Policy stores an array because its premium can change each month.
+// Complete CalculateDiscountedPremiumTotal:
+// - Ignore monthly premiums that are zero or negative.
+// - Give each valid monthly premium a 10% discount.
+// - Return the total after the discounts.
 //
-// Example: a monthly premium of 100.00 should return 1200.00.
+// Example:
+// Monthly premiums: { 100.00, 120.00, 0.00, -20.00 }
+// Discounted values:  { 90.00, 108.00 }
+// Expected total:     198.00
 
 using System;
 
-public class Program
+public class Policy
 {
-    public static decimal CalculateAnnualPremium(decimal monthlyPremium)
+    public decimal[] MonthlyPremiums { get; set; }
+
+    public Policy(decimal[] monthlyPremiums)
     {
-        // Write one line here.
-        return 0m;
+        MonthlyPremiums = monthlyPremiums;
     }
 
+    public decimal CalculateDiscountedPremiumTotal()
+    {
+        decimal total = 0m;
+
+        // Write your loop and filter here.
+
+        return total;
+    }
+}
+
+public class Program
+{
     public static void Main()
     {
+        var policy = new Policy(
+            new decimal[] { 100.00m, 120.00m, 0.00m, -20.00m });
+
         Console.WriteLine(
-            CalculateAnnualPremium(100.00m)); // Expected: 1200.00
+            policy.CalculateDiscountedPremiumTotal()); // Expected: 198.00
     }
 }`,
       answerKey: `PLAIN-ENGLISH ANSWER
-There are 12 months in a year, so multiply the monthly premium by 12. The
-decimal type is commonly used for money because it represents decimal values
-more predictably than float or double.
+Loop through the policy's MonthlyPremiums. Skip zero and negative values. For
+each valid premium, keep 90% of it by multiplying by 0.90m, then add that
+discounted value to the total. The decimal type is normally used for money.
 
 ONE GOOD SOLUTION
-public static decimal CalculateAnnualPremium(decimal monthlyPremium)
+public decimal CalculateDiscountedPremiumTotal()
 {
-    return monthlyPremium * 12;
+    decimal total = 0m;
+
+    foreach (decimal premium in MonthlyPremiums)
+    {
+        if (premium > 0)
+        {
+            total += premium * 0.90m;
+        }
+    }
+
+    return total;
 }
 
 HOW TO GRADE (0–3)
-3 — Returns monthlyPremium * 12 and can explain the result.
-2 — Has the correct multiplication with a small syntax or return-type mistake.
-1 — Understands the annual amount uses 12 months but cannot write the return.
-0 — Cannot identify the calculation.
+3 — Loops through the array, includes only positive premiums, applies the 10%
+    discount, and returns 198.00.
+2 — Correct loop and filter but misses or slightly miscalculates the discount,
+    or has one small syntax mistake.
+1 — Can explain the filter or discount but cannot combine them in the loop.
+0 — Does not iterate through the monthly premiums or cannot identify the rules.
 
-Do not require input validation or rounding in this warm-up. The point is to
-help the candidate get comfortable before creating the insurance classes.`
+ALSO CORRECT WITH LINQ
+return MonthlyPremiums
+    .Where(premium => premium > 0)
+    .Sum(premium => premium * 0.90m);
+
+Do not require LINQ, rounding, null handling, or exactly 12 array entries. The
+point is to warm up with an object, an array, a filter, and simple arithmetic
+before expanding the insurance model in the next question.`
     },
 
     'csharp-rest-api': {
@@ -822,7 +861,7 @@ whether you have memorized every piece of syntax.
 
 ## What we will cover
 
-1. C# — Insurance premium warm-up
+1. C# — Discounted premium warm-up
 2. C# — Model Customers and Policies
 3. SQL Server — Simple Join
 4. LINQ — Simple Filter
