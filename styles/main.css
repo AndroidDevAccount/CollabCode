@@ -874,21 +874,54 @@ html, body {
   opacity: 0.45;
 }
 
-.answer-key-modal-content {
-  width: min(760px, 90vw);
-  max-height: 85vh;
-  overflow-y: auto;
+#answer-key-panel {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 46%;
+  min-width: 420px;
+  background: #20231e;
+  border-left: 2px solid #40916c;
+  display: flex;
+  flex-direction: column;
+  z-index: 90;
+  box-shadow: -5px 0 20px rgba(0, 0, 0, 0.35);
+}
+
+#answer-key-header {
+  padding: 13px 16px;
+  background: #2d6a4f;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+}
+
+#close-answer-key {
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+#firepad-container.with-answer-key {
+  margin-right: 46%;
 }
 
 .answer-key-content {
+  flex: 1;
+  overflow-y: auto;
   text-align: left;
   white-space: pre-wrap;
-  background: #171717;
+  background: #20231e;
   color: #eee;
-  border: 1px solid #444;
-  border-radius: 6px;
   padding: 16px;
-  margin: 14px 0;
   font: 14px/1.5 Consolas, Monaco, monospace;
 }
 

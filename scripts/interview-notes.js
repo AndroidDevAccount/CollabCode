@@ -36,6 +36,9 @@
           firepadContainer.classList.remove('with-notes');
           notesToggleBtn.classList.remove('active');
         } else {
+          if (window.closeInterviewAnswerKey) {
+            window.closeInterviewAnswerKey();
+          }
           notesPanel.style.display = 'flex';
           firepadContainer.classList.add('with-notes');
           notesToggleBtn.classList.add('active');

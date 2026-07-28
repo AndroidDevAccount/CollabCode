@@ -477,10 +477,42 @@
     // Interview question templates (interviewer only)
     const templateSelector = document.getElementById('template-selector');
     const answerKeyButton = document.getElementById('answer-key-btn');
+    const answerKeyPanel = document.getElementById('answer-key-panel');
+    const firepadContainer = document.getElementById('firepad-container');
+
+    function closeAnswerKeyPanel() {
+      if (answerKeyPanel) answerKeyPanel.style.display = 'none';
+      if (firepadContainer) firepadContainer.classList.remove('with-answer-key');
+      if (answerKeyButton) answerKeyButton.textContent = 'Answer Key';
+      if (editor) editor.resize();
+    }
+
+    function openAnswerKeyPanel(template) {
+      if (!template?.answerKey || !answerKeyPanel) return;
+
+      document.getElementById('answer-key-title').textContent =
+        `Answer Key - ${template.title}`;
+      document.getElementById('answer-key-content').textContent =
+        template.answerKey;
+
+      const notesPanel = document.getElementById('notes-panel');
+      if (notesPanel) notesPanel.style.display = 'none';
+      if (firepadContainer) {
+        firepadContainer.classList.remove('with-notes');
+        firepadContainer.classList.add('with-answer-key');
+      }
+
+      answerKeyPanel.style.display = 'flex';
+      if (answerKeyButton) answerKeyButton.textContent = 'Hide Answer Key';
+      if (editor) editor.resize();
+    }
+
+    window.closeInterviewAnswerKey = closeAnswerKeyPanel;
     if (templateSelector) {
       if (!currentUser || !currentUser.isAdmin) {
         templateSelector.style.display = 'none';
         if (answerKeyButton) answerKeyButton.style.display = 'none';
+        closeAnswerKeyPanel();
       } else {
         if (answerKeyButton) answerKeyButton.style.display = 'inline-block';
         templateSelector.addEventListener('change', function() {
@@ -496,6 +528,7 @@
           editor.setValue(template.content, -1);
           editor.clearSelection();
           this.value = '';
+          openAnswerKeyPanel(template);
         });
 
         if (answerKeyButton) {
@@ -503,23 +536,17 @@
             const template = window.InterviewTemplates?.[activeInterviewTemplateKey];
             if (!template?.answerKey) return;
 
-            document.getElementById('answer-key-title').textContent =
-              `Answer Key — ${template.title}`;
-            document.getElementById('answer-key-content').textContent =
-              template.answerKey;
-            const modal = document.getElementById('answerKeyModal');
-            modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('show'), 10);
+            if (answerKeyPanel.style.display === 'none') {
+              openAnswerKeyPanel(template);
+            } else {
+              closeAnswerKeyPanel();
+            }
           });
         }
 
         const closeAnswerKey = document.getElementById('close-answer-key');
         if (closeAnswerKey) {
-          closeAnswerKey.addEventListener('click', function() {
-            const modal = document.getElementById('answerKeyModal');
-            modal.classList.remove('show');
-            setTimeout(() => { modal.style.display = 'none'; }, 300);
-          });
+          closeAnswerKey.addEventListener('click', closeAnswerKeyPanel);
         }
       }
     }

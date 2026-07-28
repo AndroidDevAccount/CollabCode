@@ -670,6 +670,15 @@
               </div>
             </div>
           </div>
+
+          <!-- Interviewer-only Answer Key Panel -->
+          <aside id="answer-key-panel" style="display: none;">
+            <div id="answer-key-header">
+              <span id="answer-key-title">Answer Key</span>
+              <button id="close-answer-key" type="button" aria-label="Close answer key">×</button>
+            </div>
+            <div id="answer-key-content" class="answer-key-content"></div>
+          </aside>
           
           <div id="output-panel" style="display: none;">
             <div id="output-header">
@@ -720,24 +729,12 @@
       </div>
     </div>
 
-    <!-- Interviewer-only answer key -->
-    <div id="answerKeyModal" class="custom-modal" style="display: none;">
-      <div class="custom-modal-content answer-key-modal-content">
-        <div class="custom-modal-icon info">✓</div>
-        <h3 id="answer-key-title" class="custom-modal-title">Answer Key</h3>
-        <div id="answer-key-content" class="answer-key-content"></div>
-        <div class="custom-modal-buttons">
-          <button id="close-answer-key" class="custom-modal-btn confirm">Close</button>
-        </div>
-      </div>
-    </div>
-
     <!-- Simple Templates (must load before firepad.js) -->
     <script src="scripts/simple-templates.js?v=2"></script>
     <script src="scripts/interview-templates.js?v=4"></script>
     <script src="scripts/custom-dialogs.js?v=2"></script>
-    <script src="scripts/firepad.js?v=5"></script>
-    <script src="scripts/interview-notes.js?v=3"></script>
+    <script src="scripts/firepad.js?v=6"></script>
+    <script src="scripts/interview-notes.js?v=4"></script>
     <script src="scripts/slack-integration.js?v=4"></script>
     <script src="scripts/posthog-tracking.js?v=2"></script>
     <script src="scripts/session-tracking.js?v=1"></script>
