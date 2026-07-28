@@ -812,9 +812,9 @@ padding is inside the element's border; margin is outside the border.`
     },
 
     'dotnet-interview-plan': {
-      title: 'Your Junior .NET Interview',
+      title: 'Your .NET Interview',
       language: 'markdown',
-      content: `# Welcome to your junior .NET interview
+      content: `# Welcome to your .NET interview
 
 You will work through ten short exercises. Each one is intended to take about
 five minutes. The goal is to understand how you approach a problem—not to test
@@ -848,8 +848,8 @@ reasoning, honest communication, and learning from a hint are all valuable.`,
 Each exercise has a 0–3 score in its own Answer Key.
 
 Suggested total for 10 questions: 30 points
-27–30 — Strong junior performance
-20–26 — Reasonable junior performance; discuss weak areas
+27–30 — Strong performance
+20–26 — Reasonable performance; discuss weak areas
 12–19 — Significant gaps; consider experience claims carefully
 0–11  — Fundamentals were not demonstrated
 

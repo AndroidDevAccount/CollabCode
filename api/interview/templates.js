@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const templateData = require('./templates-data');
 
 const templateOrder = [
+  'dotnet-interview-plan',
   'csharp-warmup',
   'csharp-debugging',
   'sql-policy-query',
@@ -13,8 +14,7 @@ const templateOrder = [
   'csharp-rest-api',
   'solid-refactor',
   'ai-prompting',
-  'frontend-css',
-  'dotnet-interview-plan'
+  'frontend-css'
 ];
 
 const templates = Object.fromEntries(

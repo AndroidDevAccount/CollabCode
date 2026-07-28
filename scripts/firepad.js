@@ -13,6 +13,7 @@
   let isInitialized = false;
   let firepadReady = false;
   let activeInterviewTemplateKey = null;
+  let currentSessionIsNew = false;
   
   // Session termination modal HTML
   const terminationModalHTML = `
@@ -82,6 +83,7 @@
     console.log('User:', userName, 'Code:', sessionCode, 'New:', isNew, 'Admin:', isAdmin);
     
     currentSessionCode = sessionCode;
+    currentSessionIsNew = isNew;
     currentUser = {
       name: userName,
       id: 'user_' + Math.random().toString(36).substr(2, 9),
@@ -544,11 +546,11 @@
         }
 
         if (answerKeyButton) answerKeyButton.style.display = 'inline-block';
-        templateSelector.addEventListener('change', function() {
-          const template = window.InterviewTemplates?.[this.value];
+        function loadInterviewTemplate(templateKey) {
+          const template = window.InterviewTemplates?.[templateKey];
           if (!template) return;
 
-          activeInterviewTemplateKey = this.value;
+          activeInterviewTemplateKey = templateKey;
           if (answerKeyButton) answerKeyButton.disabled = false;
           const languageControl = document.getElementById('language-selector');
           if (languageControl) languageControl.value = template.language;
@@ -556,8 +558,12 @@
           changeLanguage(template.language);
           editor.setValue(template.content, -1);
           editor.clearSelection();
-          this.value = '';
           openAnswerKeyPanel(template);
+        }
+
+        templateSelector.addEventListener('change', function() {
+          loadInterviewTemplate(this.value);
+          this.value = '';
         });
 
         if (answerKeyButton) {
@@ -576,6 +582,23 @@
         const closeAnswerKey = document.getElementById('close-answer-key');
         if (closeAnswerKey) {
           closeAnswerKey.addEventListener('click', closeAnswerKeyPanel);
+        }
+
+        if (currentSessionIsNew) {
+          let overviewLoadAttempts = 0;
+          const loadOverviewWhenReady = function() {
+            if (!firepadReady) {
+              overviewLoadAttempts += 1;
+              if (overviewLoadAttempts >= 100) {
+                console.error('Timed out waiting to load the interview overview');
+                return;
+              }
+              setTimeout(loadOverviewWhenReady, 50);
+              return;
+            }
+            loadInterviewTemplate('dotnet-interview-plan');
+          };
+          loadOverviewWhenReady();
         }
       }
     }
