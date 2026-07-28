@@ -1831,6 +1831,7 @@
 
     // Show main container - force it visible
     const mainContainer = document.getElementById('main-container');
+    const previousSessionCode = mainContainer?.dataset.sessionCode;
     if (mainContainer) {
       mainContainer.style.display = 'flex';
       mainContainer.style.visibility = 'visible';
@@ -1840,12 +1841,11 @@
     } else {
       console.error('CRITICAL: main-container element not found in DOM!');
       alert('Error: Unable to load editor interface. Please refresh the page.');
+      sessionStarting = false;
       return;
     }
 
-    const existingMainContainer = document.getElementById('main-container');
-    const existingSessionCode = existingMainContainer?.dataset.sessionCode;
-    if (existingSessionCode && existingSessionCode !== sessionCode) {
+    if (previousSessionCode && previousSessionCode !== sessionCode) {
       if (!isNew) {
         window.location.hash = sessionCode;
         window.location.reload();

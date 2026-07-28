@@ -73,7 +73,11 @@ module.exports = async (req, res) => {
 
   try {
     const normalizedEmail = String(email).trim().toLowerCase();
-    const ownerLogin = normalizedEmail === String(ADMIN_EMAIL).trim().toLowerCase();
+    const normalizedOwnerEmail = ADMIN_EMAIL
+      ? String(ADMIN_EMAIL).trim().toLowerCase()
+      : '';
+    const ownerLogin = Boolean(normalizedOwnerEmail) &&
+      normalizedEmail === normalizedOwnerEmail;
     let passwordHash = ownerLogin ? ADMIN_PASSWORD_HASH : null;
 
     if (!ownerLogin && admin.apps.length) {
