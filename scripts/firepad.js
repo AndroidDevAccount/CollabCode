@@ -479,22 +479,9 @@
       if (!currentUser || !currentUser.isAdmin) {
         templateSelector.style.display = 'none';
       } else {
-        templateSelector.addEventListener('change', async function() {
+        templateSelector.addEventListener('change', function() {
           const template = window.InterviewTemplates?.[this.value];
           if (!template) return;
-
-          const currentContent = editor.getValue().trim();
-          if (currentContent) {
-            const confirmed = await window.confirmAsync(
-              'Loading this question will replace the current shared editor contents.',
-              'Load Interview Question',
-              'warning'
-            );
-            if (!confirmed) {
-              this.value = '';
-              return;
-            }
-          }
 
           const languageControl = document.getElementById('language-selector');
           if (languageControl) languageControl.value = template.language;
