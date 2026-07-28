@@ -39,6 +39,17 @@ const Auth = (function() {
         console.error('Session restore failed:', e);
         localStorage.removeItem('auth_session');
       }
+      return;
+    }
+
+    const candidateStored = sessionStorage.getItem('candidate_session');
+    if (candidateStored) {
+      try {
+        session = JSON.parse(candidateStored);
+      } catch (e) {
+        console.error('Candidate session restore failed:', e);
+        sessionStorage.removeItem('candidate_session');
+      }
     }
   }
   
@@ -224,9 +235,12 @@ const Auth = (function() {
   // Get current session (compatibility with app.js)
   function getCurrentSession() {
     return {
+      isLoggedIn: session.isAuthenticated === true,
+      isAuthenticated: session.isAuthenticated === true,
       isAdmin: session.isAdmin,
       userName: session.userName,
-      email: session.email
+      email: session.email,
+      expiresAt: session.expiresAt
     };
   }
   

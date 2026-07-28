@@ -1,10 +1,29 @@
 // Main Application Controller
 (function() {
+  let appInitialized = false;
+
   // Initialize the application
   function init() {
+    if (appInitialized) return;
+    appInitialized = true;
+
     setupLandingPage();
     setupCandidateFlow();
     setupAdminFlow();
+
+    if (Auth.isAdmin()) {
+      restoreAdminDashboard();
+    }
+  }
+
+  async function restoreAdminDashboard() {
+    const result = await Auth.verifySession();
+    if (!result.valid) return;
+
+    document.getElementById('landingModal').style.display = 'none';
+    document.getElementById('adminLoginModal').style.display = 'none';
+    document.getElementById('adminDashboardModal').style.display = 'flex';
+    setupAdminDashboard();
   }
 
   // Setup landing page
@@ -185,6 +204,8 @@
     const viewAllSessionsBtn = document.getElementById('viewAllSessionsBtn');
     const closeSessionsModalBtn = document.getElementById('closeSessionsModalBtn');
     const interviewerNameInput = document.getElementById('interviewerName');
+
+    restoreRecentAdminSession();
     
     // Load saved interviewer name from localStorage
     if (interviewerNameInput) {
@@ -263,6 +284,7 @@
       }
       
       const sessionCode = Math.floor(100000 + Math.random() * 900000).toString();
+      rememberAdminSession(sessionCode);
       console.log('CREATE SESSION: Generated code:', sessionCode);
       console.trace('CREATE SESSION: Stack trace for debugging');
       
@@ -300,6 +322,7 @@
       const sessionCode = adminSessionCode.value.trim();
       
       if (sessionCode.length === 6) {
+        rememberAdminSession(sessionCode);
         // Track interviewer joining session
         const currentUser = Auth.getCurrentUser();
         const interviewerName = document.getElementById('interviewerName')?.value.trim();
@@ -343,6 +366,48 @@
       document.getElementById('landingModal').style.display = 'flex';
       document.getElementById('activeSession').style.display = 'none';
     });
+  }
+
+  function rememberAdminSession(sessionCode) {
+    localStorage.setItem('recent_admin_session', JSON.stringify({
+      code: sessionCode,
+      lastOpenedAt: Date.now()
+    }));
+  }
+
+  function restoreRecentAdminSession() {
+    const activeSession = document.getElementById('activeSession');
+    const activeSessionCode = document.getElementById('activeSessionCode');
+    if (!activeSession || !activeSessionCode) return;
+
+    try {
+      const recent = JSON.parse(localStorage.getItem('recent_admin_session'));
+      if (!recent?.code) return;
+
+      activeSessionCode.textContent = recent.code;
+      activeSession.style.display = 'block';
+
+      if (window.firebase?.database) {
+        window.firebase.database().ref(`sessions/${recent.code}`).once('value')
+          .then(snapshot => {
+            const sessionData = snapshot.val();
+            if (!sessionData) {
+              activeSession.style.display = 'none';
+              localStorage.removeItem('recent_admin_session');
+              return;
+            }
+
+            const ended = sessionData.terminated?.terminated === true;
+            const badge = activeSession.querySelector('.session-status-badge');
+            const heading = activeSession.querySelector('h4');
+            if (badge) badge.textContent = ended ? 'RECENT' : 'LIVE';
+            if (heading) heading.textContent = ended ? 'Recent Session' : 'Active Session';
+          })
+          .catch(error => console.error('Failed to restore recent session:', error));
+      }
+    } catch (error) {
+      localStorage.removeItem('recent_admin_session');
+    }
   }
 
   // Validate session before joining
@@ -1619,8 +1684,14 @@
     if (!isNew) {
       const validation = await validateSession(sessionCode);
       if (!validation.valid) {
-        alert(validation.error || 'Invalid session');
-        location.reload();
+        if (Auth.isAdmin()) {
+          history.replaceState(null, '', window.location.pathname + window.location.search);
+          sessionStarting = false;
+          init();
+        } else {
+          alert(validation.error || 'Invalid session');
+          location.reload();
+        }
         return;
       }
     }
