@@ -450,31 +450,39 @@ Accept either the dotnet CLI or Package Manager Console command style.`
     },
 
     'solid-refactor': {
-      title: 'SOLID Single Responsibility',
+      title: 'SOLID Dependency Injection',
       language: 'csharp',
       content: `// 5-minute SOLID question
 //
-// This class saves a policy AND sends an email.
-// What are its two responsibilities?
-// Name two interfaces you could inject to separate them.
+// The repository is already passed into the constructor as an interface.
+// The email sender is still created directly inside PolicyService.
+//
+// Refactor PolicyService so IEmailService is also constructor-injected:
+// 1. Change the _email field to IEmailService.
+// 2. Add IEmailService email to the constructor.
+// 3. Assign it to _email.
+// 4. Do not create EmailSender directly.
+//
+// Which SOLID letter does this change demonstrate most directly?
 
 public class PolicyService
 {
+    private readonly IPolicyRepository _policies;
+    private readonly EmailSender _email = new EmailSender();
+
+    public PolicyService(IPolicyRepository policies)
+    {
+        _policies = policies;
+    }
+
     public void CreatePolicy(Policy policy)
     {
-        // Saves policy to SQL Server
-        SaveToDatabase(policy);
-
-        // Sends confirmation email
-        SendEmail(policy.CustomerEmail);
+        _policies.Save(policy);
+        _email.SendConfirmation(policy.CustomerEmail);
     }
 }
 
-// Write your answer as comments below:
-// Responsibility 1:
-// Responsibility 2:
-// Interface 1:
-// Interface 2:`,
+// SOLID letter:`,
       answerKey: `WHAT IS SOLID?
 SOLID is a set of five guidelines for organizing object-oriented code so it is
 easier to change, test, and maintain:
@@ -492,49 +500,59 @@ D — Dependency Inversion:
     implementations.
 
 Do not expect the candidate to recite all five definitions. This exercise mainly
-tests the S: Single Responsibility Principle.
+tests the D: Dependency Inversion Principle and basic constructor injection.
 
 WHAT IS WRONG WITH THIS CLASS?
-PolicyService has two unrelated jobs:
-1. Storing policy data in SQL Server.
-2. Sending an email notification.
+The repository already follows Dependency Inversion: PolicyService depends on
+IPolicyRepository rather than constructing a SQL repository. Email does not:
+new EmailSender() permanently couples the class to that implementation. It is
+harder to replace the email provider and harder to test without sending email.
 
-It therefore has two reasons to change. A database change and an email-provider
-change would both require editing the same class. Separating those jobs also
-makes the code easier to test: a test can substitute fake implementations
-instead of connecting to a real database or sending a real email.
-
-ONE GOOD ANSWER
-// Responsibility 1: Save/read policy data.
-// Responsibility 2: Send policy notifications.
-// Interface 1: IPolicyRepository
-// Interface 2: IEmailService (or INotificationService)
-
-WHAT "INJECT THE INTERFACES" MEANS
-The class receives the two helpers, usually through its constructor, instead of
-creating a SQL connection or email sender itself:
-
-public PolicyService(
-    IPolicyRepository policies,
-    IEmailService email)
+ONE GOOD SOLUTION
+public class PolicyService
 {
-    _policies = policies;
-    _email = email;
+    private readonly IPolicyRepository _policies;
+    private readonly IEmailService _email;
+
+    public PolicyService(
+        IPolicyRepository policies,
+        IEmailService email)
+    {
+        _policies = policies;
+        _email = email;
+    }
+
+    public void CreatePolicy(Policy policy)
+    {
+        _policies.Save(policy);
+        _email.SendConfirmation(policy.CustomerEmail);
+    }
 }
 
-CreatePolicy would then call _policies.Save(policy) and
-_email.SendConfirmation(policy.CustomerEmail). The exact names do not matter.
+// SOLID letter: D — Dependency Inversion
+
+WHY THIS HELPS
+A production application can inject a real email service. A unit test can inject
+a fake email service that records the call without sending anything.
+
+SINGLE RESPONSIBILITY CONNECTION
+IPolicyRepository owns persistence and IEmailService owns email delivery.
+PolicyService can reasonably coordinate the single "create a policy" workflow.
+The clearest problem shown by new EmailSender() is the concrete dependency, so
+Dependency Inversion is the primary answer.
 
 HOW TO GRADE (0–3)
-3 — Clearly identifies both jobs and proposes two sensible interfaces.
-2 — Identifies both jobs but names only one interface or needs a hint.
-1 — Says "too much in one class" without identifying the two jobs.
-0 — Cannot see any reason to separate database and email work.
+3 — Injects IEmailService through the constructor, stores it in the field,
+    removes new EmailSender(), and identifies D/Dependency Inversion.
+2 — Correctly performs the constructor refactor but cannot name the principle,
+    or identifies the principle with a small code mistake.
+1 — Says an interface would help testing but cannot wire it into the constructor.
+0 — Leaves new EmailSender() in place or cannot explain the direct dependency.
 
 INTERVIEWER TIP
-Give full credit for names such as IPolicyDataService, IRepository,
-INotificationService, or IMailer when their intended jobs are clear. Practical
-reasoning matters more than memorizing the acronym.`
+IEmailService, INotificationService, or IMailer are all reasonable names. Give
+credit for practical understanding even if the candidate calls this dependency
+injection without remembering the words "Dependency Inversion."`
     },
 
     'csharp-debugging': {
@@ -798,7 +816,7 @@ whether you have memorized every piece of syntax.
 5. Entity Framework — Add a Field and Migration
 6. ASP.NET MVC — Validation
 7. C# — REST API Basics
-8. SOLID — Single Responsibility
+8. SOLID — Constructor Injection
 9. AI — Prompt a Coding Assistant
 10. HTML/CSS — Responsive Policy Card
 
