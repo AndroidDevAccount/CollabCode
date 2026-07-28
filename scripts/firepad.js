@@ -12,6 +12,7 @@
   let previousUsers = {};
   let isInitialized = false;
   let firepadReady = false;
+  let activeInterviewTemplateKey = null;
   
   // Session termination modal HTML
   const terminationModalHTML = `
@@ -471,6 +472,56 @@
           }
         }
       });
+    }
+
+    // Interview question templates (interviewer only)
+    const templateSelector = document.getElementById('template-selector');
+    const answerKeyButton = document.getElementById('answer-key-btn');
+    if (templateSelector) {
+      if (!currentUser || !currentUser.isAdmin) {
+        templateSelector.style.display = 'none';
+        if (answerKeyButton) answerKeyButton.style.display = 'none';
+      } else {
+        if (answerKeyButton) answerKeyButton.style.display = 'inline-block';
+        templateSelector.addEventListener('change', function() {
+          const template = window.InterviewTemplates?.[this.value];
+          if (!template) return;
+
+          activeInterviewTemplateKey = this.value;
+          if (answerKeyButton) answerKeyButton.disabled = false;
+          const languageControl = document.getElementById('language-selector');
+          if (languageControl) languageControl.value = template.language;
+          settingsRef.child('language').set(template.language);
+          changeLanguage(template.language);
+          editor.setValue(template.content, -1);
+          editor.clearSelection();
+          this.value = '';
+        });
+
+        if (answerKeyButton) {
+          answerKeyButton.addEventListener('click', function() {
+            const template = window.InterviewTemplates?.[activeInterviewTemplateKey];
+            if (!template?.answerKey) return;
+
+            document.getElementById('answer-key-title').textContent =
+              `Answer Key — ${template.title}`;
+            document.getElementById('answer-key-content').textContent =
+              template.answerKey;
+            const modal = document.getElementById('answerKeyModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+          });
+        }
+
+        const closeAnswerKey = document.getElementById('close-answer-key');
+        if (closeAnswerKey) {
+          closeAnswerKey.addEventListener('click', function() {
+            const modal = document.getElementById('answerKeyModal');
+            modal.classList.remove('show');
+            setTimeout(() => { modal.style.display = 'none'; }, 300);
+          });
+        }
+      }
     }
 
     // Theme selector

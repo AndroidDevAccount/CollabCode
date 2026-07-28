@@ -557,6 +557,21 @@
               <option value="markdown">📝 Markdown</option>
             </optgroup>
           </select>
+
+          <select id="template-selector" title="Load Interview Question">
+            <option value="">Load .NET question…</option>
+            <option value="csharp-warmup">C# — Very Simple Warm-up</option>
+            <option value="csharp-rest-api">C# — Third-party REST API</option>
+            <option value="aspnet-mvc">ASP.NET MVC — Controller Design</option>
+            <option value="sql-policy-query">SQL Server — Policy Query</option>
+            <option value="ef-linq">Entity Framework + LINQ</option>
+            <option value="solid-refactor">SOLID — Refactoring</option>
+            <option value="csharp-debugging">C# — Debugging & Reliability</option>
+            <option value="dotnet-interview-plan">Full .NET Interview Plan</option>
+          </select>
+          <button id="answer-key-btn" type="button" style="display: none;" disabled>
+            Answer Key
+          </button>
           
           <select id="theme-selector">
             <option value="monokai">Monokai</option>
@@ -705,10 +720,23 @@
       </div>
     </div>
 
+    <!-- Interviewer-only answer key -->
+    <div id="answerKeyModal" class="custom-modal" style="display: none;">
+      <div class="custom-modal-content answer-key-modal-content">
+        <div class="custom-modal-icon info">✓</div>
+        <h3 id="answer-key-title" class="custom-modal-title">Answer Key</h3>
+        <div id="answer-key-content" class="answer-key-content"></div>
+        <div class="custom-modal-buttons">
+          <button id="close-answer-key" class="custom-modal-btn confirm">Close</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Simple Templates (must load before firepad.js) -->
     <script src="scripts/simple-templates.js?v=2"></script>
+    <script src="scripts/interview-templates.js?v=4"></script>
     <script src="scripts/custom-dialogs.js?v=2"></script>
-    <script src="scripts/firepad.js?v=3"></script>
+    <script src="scripts/firepad.js?v=5"></script>
     <script src="scripts/interview-notes.js?v=3"></script>
     <script src="scripts/slack-integration.js?v=4"></script>
     <script src="scripts/posthog-tracking.js?v=2"></script>
