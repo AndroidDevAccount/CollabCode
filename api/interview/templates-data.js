@@ -777,8 +777,12 @@ breathing room around its content, and a visible border.
 Update only the CSS to:
 1. Make the card 400px wide.
 2. Add 16px of space inside the card.
-3. Add a 1px solid gray border and 8px rounded corners.
-4. On screens 480px wide or smaller, make the button fill the card width.
+3. Add a 1px solid gray border.
+4. Make the heading 24px, Arial, and bold.
+5. Make the paragraphs Arial with normal font weight.
+6. Give the button a blue background, white text, 10px vertical and 16px
+   horizontal padding, no border, and bold Arial text.
+7. On screens 480px wide or smaller, make the button fill the card width.
 -->
 
 <style>
@@ -792,6 +796,8 @@ Update only the CSS to:
         width: auto;
     }
 
+    /* Add the heading and paragraph styles here */
+
     /* Add the mobile rule here */
 </style>
 
@@ -804,18 +810,35 @@ Update only the CSS to:
 </article>`,
       answerKey: `PLAIN-ENGLISH ANSWER
 width sets the card's width. Padding adds space between the content and the
-border. The media query changes the button only on small screens.
+border. The h2 and p selectors style those element types inside the card. The
+media query changes the button only on small screens.
 
 ONE GOOD SOLUTION
 .policy-card {
     width: 400px;
     padding: 16px;
     border: 1px solid gray;
-    border-radius: 8px;
+}
+
+.policy-card h2 {
+    font-family: Arial, sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.policy-card p {
+    font-family: Arial, sans-serif;
+    font-weight: normal;
 }
 
 .details-button {
     width: auto;
+    padding: 10px 16px;
+    border: none;
+    background-color: blue;
+    color: white;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
 }
 
 @media (max-width: 480px) {
@@ -825,14 +848,16 @@ ONE GOOD SOLUTION
 }
 
 HOW TO GRADE (0-3)
-3 — Adds the 400px width, padding, border, rounded corners, and the mobile
-    button rule.
+3 — Adds the card layout, requested heading and paragraph typography, button
+    styling, and the mobile button rule.
 2 — Completes most changes but misses one detail or makes a minor syntax error.
-1 — Can add basic padding or border but cannot make the card responsive.
+1 — Can add one or two basic properties but needs substantial help with the
+    selectors or remaining styles.
 0 — Does not know which CSS properties control these visible changes.
 
 ACCEPTABLE VARIATIONS
 - Colors such as #999, #ccc, or another reasonable gray are fine.
+- A reasonable blue such as #0066cc, royalblue, or Bootstrap blue is fine.
 - A close breakpoint such as 500px is fine if the candidate explains it.
 - Equivalent selectors and reasonable pixel/rem values are fine.
 
