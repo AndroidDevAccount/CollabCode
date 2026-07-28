@@ -602,18 +602,8 @@
         if (answerKeyButton) answerKeyButton.style.display = 'none';
         closeAnswerKeyPanel();
       } else {
-        const customSetStorageKey = 'opencollab_custom_question_sets';
         let questionSets = {};
-
-        function readCustomQuestionSets() {
-          try {
-            const saved = JSON.parse(localStorage.getItem(customSetStorageKey) || '[]');
-            return Array.isArray(saved) ? saved : [];
-          } catch (error) {
-            console.warn('Ignoring invalid saved question sets:', error);
-            return [];
-          }
-        }
+        let activeQuestionSetKey = null;
 
         function validateImportedQuestionSet(value) {
           if (!value || typeof value !== 'object' || Array.isArray(value)) {
@@ -659,74 +649,84 @@
           };
         }
 
-        function installCustomQuestionSets(customSets) {
-          customSets.forEach(customSet => {
-            const setKey = `custom:${customSet.id}`;
-            const questionKeys = customSet.questions.map((question, index) => {
-              const questionKey = `${setKey}:${index}`;
-              window.InterviewTemplates[questionKey] = question;
-              return questionKey;
-            });
-            questionSets[setKey] = {
-              title: customSet.name,
-              description: customSet.description,
-              questions: questionKeys,
-              custom: true
-            };
-          });
-        }
+        function renderQuestionSetPicker() {
+          templateSelector.replaceChildren(new Option('Interview Tools', ''));
 
-        function renderQuestionOptions() {
-          const previouslySelected = activeInterviewTemplateKey || '';
-          templateSelector.replaceChildren(new Option('Interview Questions', ''));
-          Object.values(questionSets).filter(set => !set.custom).forEach(set => {
-            const group = document.createElement('optgroup');
-            group.label = set.title;
-            set.questions.forEach(questionKey => {
-              const template = window.InterviewTemplates[questionKey];
-              if (!template) return;
-              group.appendChild(new Option(template.title, questionKey));
+          const includedGroup = document.createElement('optgroup');
+          includedGroup.label = 'Included Questions';
+          Object.entries(questionSets)
+            .filter(([, set]) => !set.custom)
+            .forEach(([key, set]) => {
+              includedGroup.appendChild(new Option(set.title, key));
             });
-            if (group.children.length > 0) templateSelector.appendChild(group);
-          });
+          templateSelector.appendChild(includedGroup);
 
           const customGroup = document.createElement('optgroup');
           customGroup.label = 'Custom Questions';
-          Object.values(questionSets).filter(set => set.custom).forEach(set => {
-            set.questions.forEach(questionKey => {
-              const template = window.InterviewTemplates[questionKey];
-              if (!template) return;
-              customGroup.appendChild(
-                new Option(`${set.title} — ${template.title}`, questionKey)
-              );
+          Object.entries(questionSets)
+            .filter(([, set]) => set.custom)
+            .forEach(([key, set]) => {
+              customGroup.appendChild(new Option(set.title, key));
             });
-          });
-          customGroup.appendChild(new Option('Add questions from file…', '__add_custom__'));
+          customGroup.appendChild(
+            new Option('Load custom questions from file…', '__add_custom__')
+          );
           templateSelector.appendChild(customGroup);
-          templateSelector.value = previouslySelected;
           templateSelector.style.display = 'inline-block';
         }
 
-        try {
+        function renderLoadedQuestions() {
+          const set = questionSets[activeQuestionSetKey];
+          if (!set) {
+            activeQuestionSetKey = null;
+            renderQuestionSetPicker();
+            return;
+          }
+
+          templateSelector.replaceChildren(new Option(set.title, ''));
+          set.questions.forEach(questionKey => {
+            const template = window.InterviewTemplates[questionKey];
+            if (template) {
+              templateSelector.appendChild(new Option(template.title, questionKey));
+            }
+          });
+          templateSelector.appendChild(
+            new Option('Change question set…', '__change_set__')
+          );
+          templateSelector.value = set.questions.includes(activeInterviewTemplateKey)
+            ? activeInterviewTemplateKey
+            : '';
+          templateSelector.style.display = 'inline-block';
+        }
+
+        async function loadQuestionSetData() {
           const response = await fetch('/api/interview/templates', {
             method: 'GET',
             headers: Auth.getAuthHeaders()
           });
           const data = await response.json();
-
-          if (!response.ok || !data.templates) {
+          if (!response.ok || !data.templates || !data.questionSets) {
             throw new Error(data.error || 'Unable to load interview templates');
           }
-
           window.InterviewTemplates = data.templates;
-          questionSets = data.questionSets || {
-            'all-questions': {
-              title: 'All Questions',
-              questions: Object.keys(data.templates)
-            }
-          };
-          installCustomQuestionSets(readCustomQuestionSets());
-          renderQuestionOptions();
+          questionSets = data.questionSets;
+        }
+
+        try {
+          await loadQuestionSetData();
+          const [setSnapshot, questionSnapshot] = await Promise.all([
+            settingsRef.child('questionSet').once('value'),
+            settingsRef.child('activeQuestionTemplate').once('value')
+          ]);
+          const savedSetKey = setSnapshot.val();
+          const savedQuestionKey = questionSnapshot.val();
+          activeQuestionSetKey = questionSets[savedSetKey] ? savedSetKey : null;
+          if (activeQuestionSetKey &&
+              questionSets[activeQuestionSetKey].questions.includes(savedQuestionKey)) {
+            activeInterviewTemplateKey = savedQuestionKey;
+          }
+          if (activeQuestionSetKey) renderLoadedQuestions();
+          else renderQuestionSetPicker();
         } catch (error) {
           console.error('Failed to load protected interview templates:', error);
           templateSelector.style.display = 'none';
@@ -742,15 +742,29 @@
               const importedSet = validateImportedQuestionSet(
                 JSON.parse(await file.text())
               );
-              const customSets = readCustomQuestionSets()
-                .filter(set => set.id !== importedSet.id);
-              customSets.push(importedSet);
-              localStorage.setItem(customSetStorageKey, JSON.stringify(customSets));
-              installCustomQuestionSets([importedSet]);
-              renderQuestionOptions();
-              showNotification(`Imported "${importedSet.name}" with ${importedSet.questions.length} questions.`);
+              const response = await fetch('/api/interview/templates', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  ...Auth.getAuthHeaders()
+                },
+                body: JSON.stringify(importedSet)
+              });
+              const data = await response.json();
+              if (!response.ok || !data.setId) {
+                throw new Error(data.error || 'Unable to save custom questions');
+              }
+              await loadQuestionSetData();
+              activeQuestionSetKey = data.setId;
+              activeInterviewTemplateKey = null;
+              await settingsRef.update({
+                questionSet: activeQuestionSetKey,
+                activeQuestionTemplate: null
+              });
+              renderLoadedQuestions();
+              showNotification(`Saved "${importedSet.name}" with ${importedSet.questions.length} questions.`);
             } catch (error) {
-              alert(`Could not import question set: ${error.message}`);
+              alert(`Could not save question set: ${error.message}`);
             }
           });
         }
@@ -765,6 +779,7 @@
           const languageControl = document.getElementById('language-selector');
           if (languageControl) languageControl.value = template.language;
           settingsRef.child('language').set(template.language);
+          settingsRef.child('activeQuestionTemplate').set(templateKey);
           changeLanguage(template.language);
           editor.setValue(template.content, -1);
           editor.clearSelection();
@@ -776,6 +791,30 @@
             this.value = activeInterviewTemplateKey || '';
             questionSetFileInput.value = '';
             questionSetFileInput.click();
+            return;
+          }
+          if (this.value === '__change_set__') {
+            activeQuestionSetKey = null;
+            activeInterviewTemplateKey = null;
+            answerKeyButton.disabled = true;
+            closeAnswerKeyPanel();
+            settingsRef.update({
+              questionSet: null,
+              activeQuestionTemplate: null
+            });
+            renderQuestionSetPicker();
+            return;
+          }
+          if (questionSets[this.value]) {
+            activeQuestionSetKey = this.value;
+            activeInterviewTemplateKey = null;
+            answerKeyButton.disabled = true;
+            closeAnswerKeyPanel();
+            settingsRef.update({
+              questionSet: activeQuestionSetKey,
+              activeQuestionTemplate: null
+            });
+            renderLoadedQuestions();
             return;
           }
           loadInterviewTemplate(this.value);

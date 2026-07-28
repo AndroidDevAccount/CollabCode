@@ -27,7 +27,8 @@ example. Every question requires `title`, `language`, `content`, and `answerKey`
 The language must match one supported by the editor, such as `csharp`, `sql`,
 `javascript`, `html`, or `markdown`.
 
-Imported sets are validated and saved in that browser's local storage. They are
-not uploaded to the server or written into the shared interview session.
-Importing another file with the same `id` updates that set. Administrators using
-a shared computer should clear site data after importing confidential material.
+Imported sets are validated and saved in protected Firebase storage for the
+admin team. The selected set ID is saved with the interview session, so the
+loaded question list is restored after a page refresh. Starter code and answer
+keys are returned only by the authenticated interviewer API; they are not
+written into the shared session.
