@@ -671,6 +671,15 @@
           templateSelector.value = set.questions.includes(activeInterviewTemplateKey)
             ? activeInterviewTemplateKey
             : '';
+          const activeTemplate = window.InterviewTemplates?.[activeInterviewTemplateKey];
+          if (answerKeyButton) {
+            answerKeyButton.disabled = !activeTemplate?.answerKey;
+          }
+          if (activeTemplate?.answerKey) {
+            openAnswerKeyPanel(activeTemplate);
+          } else {
+            closeAnswerKeyPanel();
+          }
           templateSelector.style.display = 'inline-block';
         }
 
