@@ -19,6 +19,7 @@ const routes = {
   '/api/auth/reset-password': './api/auth/reset-password',
   '/api/auth/update-password': './api/auth/update-password',
   '/api/sessions/create': './api/sessions/create',
+  '/api/firebase-config.js': './api/firebase-config',
   '/api/code/execute': './api/code/execute',
   '/api/activity/save': './api/activity/save',
   '/api/slack/send': './api/slack/send',
