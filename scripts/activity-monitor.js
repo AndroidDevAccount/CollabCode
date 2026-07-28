@@ -622,7 +622,7 @@
     indicator.innerHTML = `
       <div class="activity-drag-handle" title="Drag this bar to move the window" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: bold; margin: -4px -4px 8px; padding: 4px; color: #42a5f5; cursor: grab; user-select: none; border-bottom: 1px solid rgba(66, 165, 245, 0.25);">
         <span>📊 Candidate Activity</span>
-        <span aria-label="Drag to move" title="Drag to move" style="padding: 2px 6px; color: #9dccf7; font-size: 12px; letter-spacing: 1px;">|||</span>
+        <span aria-label="Drag to move" title="Drag to move" style="padding: 2px 6px; color: #9dccf7; font-size: 16px; line-height: 1;">☰</span>
       </div>
       <div style="display: grid; grid-template-columns: auto auto; gap: 4px 12px; font-size: 11px;">
         <span style="color: #999;">Score:</span>
