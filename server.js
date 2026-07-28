@@ -46,7 +46,7 @@ const staticRoot = process.env.VERCEL
   : __dirname;
 
 app.use(express.static(staticRoot, {
-  index: 'index.html',
+  index: 'app.html',
   dotfiles: 'deny'
 }));
 

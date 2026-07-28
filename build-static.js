@@ -19,4 +19,9 @@ for (const file of files) {
   fs.copyFileSync(path.join(root, file), path.join(output, file));
 }
 
+// Make the interview application the default Vercel page while preserving
+// the original promotional landing page at /landing.html.
+fs.copyFileSync(path.join(root, 'index.html'), path.join(output, 'landing.html'));
+fs.copyFileSync(path.join(root, 'app.html'), path.join(output, 'index.html'));
+
 console.log('Static client copied to public/');
