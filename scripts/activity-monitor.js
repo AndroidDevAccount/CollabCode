@@ -551,6 +551,55 @@
         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       `;
       document.body.appendChild(indicator);
+
+      const savedPosition = sessionStorage.getItem('activity-indicator-position');
+      if (savedPosition) {
+        try {
+          const position = JSON.parse(savedPosition);
+          indicator.style.left = `${position.left}px`;
+          indicator.style.top = `${position.top}px`;
+          indicator.style.bottom = 'auto';
+        } catch (error) {
+          sessionStorage.removeItem('activity-indicator-position');
+        }
+      }
+
+      let dragState = null;
+      indicator.addEventListener('pointerdown', function(event) {
+        if (!event.target.closest('.activity-drag-handle')) return;
+
+        const rect = indicator.getBoundingClientRect();
+        dragState = {
+          offsetX: event.clientX - rect.left,
+          offsetY: event.clientY - rect.top
+        };
+        indicator.setPointerCapture(event.pointerId);
+        indicator.style.left = `${rect.left}px`;
+        indicator.style.top = `${rect.top}px`;
+        indicator.style.bottom = 'auto';
+        event.preventDefault();
+      });
+
+      indicator.addEventListener('pointermove', function(event) {
+        if (!dragState) return;
+
+        const maxLeft = Math.max(0, window.innerWidth - indicator.offsetWidth);
+        const maxTop = Math.max(0, window.innerHeight - indicator.offsetHeight);
+        const left = Math.min(maxLeft, Math.max(0, event.clientX - dragState.offsetX));
+        const top = Math.min(maxTop, Math.max(0, event.clientY - dragState.offsetY));
+        indicator.style.left = `${left}px`;
+        indicator.style.top = `${top}px`;
+      });
+
+      indicator.addEventListener('pointerup', function(event) {
+        if (!dragState) return;
+        dragState = null;
+        indicator.releasePointerCapture(event.pointerId);
+        sessionStorage.setItem('activity-indicator-position', JSON.stringify({
+          left: parseFloat(indicator.style.left) || 0,
+          top: parseFloat(indicator.style.top) || 0
+        }));
+      });
     }
     
     // Color based on activity score
@@ -558,7 +607,7 @@
                       summary.activityScore > 60 ? '#ff9800' : '#ff4444';
     
     indicator.innerHTML = `
-      <div style="font-weight: bold; margin-bottom: 8px; color: #42a5f5;">
+      <div class="activity-drag-handle" title="Drag to move" style="font-weight: bold; margin-bottom: 8px; color: #42a5f5; cursor: move; user-select: none;">
         📊 Candidate Activity
       </div>
       <div style="display: grid; grid-template-columns: auto auto; gap: 4px 12px; font-size: 11px;">
