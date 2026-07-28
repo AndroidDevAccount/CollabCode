@@ -13,6 +13,7 @@ package-lock.json
 # Firebase
 firebase-admin-key.json
 serviceAccountKey.json
+*-firebase-adminsdk-*.json
 firebase-debug.log
 .firebase/
 *.serviceaccount.json
