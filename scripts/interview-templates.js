@@ -688,12 +688,96 @@ Do not grade grammar or prompt length. A shorter prompt can earn full credit if
 it communicates the context, desired outcome, constraints, and verification.`
     },
 
+    'frontend-css': {
+      title: 'HTML/CSS — Responsive Policy Card',
+      language: 'html',
+      content: `<!-- 5-minute HTML/CSS question
+
+The HTML below displays a policy summary. The existing CSS makes the card too
+wide, gives the content no breathing room, and has no visible border.
+
+Update only the CSS to:
+1. Let the card use the available width but never exceed 400px.
+2. Add 16px of space inside the card.
+3. Add a 1px solid gray border and 8px rounded corners.
+4. On screens 480px wide or smaller, make the button fill the card width.
+-->
+
+<style>
+    /* Existing CSS — edit this */
+    .policy-card {
+        width: 700px;
+        padding: 0;
+        border: none;
+    }
+
+    .details-button {
+        width: auto;
+    }
+
+    /* Add the mobile rule here */
+</style>
+
+<!-- Existing HTML — do not change -->
+<article class="policy-card">
+    <h2>Policy AUTO-1001</h2>
+    <p>Customer: Alice Johnson</p>
+    <p>Status: Active</p>
+    <button class="details-button">View details</button>
+</article>`,
+      answerKey: `PLAIN-ENGLISH ANSWER
+width: 100% lets the card shrink to fit its container. max-width: 400px stops
+it from becoming wider than 400px on a large screen. Padding adds space inside
+the border. The media query changes the button only on small screens.
+
+ONE GOOD SOLUTION
+.policy-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 16px;
+    border: 1px solid gray;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.details-button {
+    width: auto;
+}
+
+@media (max-width: 480px) {
+    .details-button {
+        width: 100%;
+    }
+}
+
+WHY BOX-SIZING HELPS
+With box-sizing: border-box, the declared width includes the padding and border.
+Without it, a width: 100% element can become slightly wider than its container.
+Treat this as a useful bonus, not a requirement unless overflow occurs.
+
+HOW TO GRADE (0-3)
+3 — Adds responsive width/max-width, padding, border, rounded corners, and the
+    mobile button rule.
+2 — Completes most changes but misses one detail or makes a minor syntax error.
+1 — Can add basic padding or border but cannot make the card responsive.
+0 — Does not know which CSS properties control these visible changes.
+
+ACCEPTABLE VARIATIONS
+- Colors such as #999, #ccc, or another reasonable gray are fine.
+- A close breakpoint such as 500px is fine if the candidate explains it.
+- Equivalent selectors and reasonable pixel/rem values are fine.
+
+OPTIONAL FOLLOW-UP
+Ask the candidate to explain the difference between margin and padding:
+padding is inside the element's border; margin is outside the border.`
+    },
+
     'dotnet-interview-plan': {
       title: 'Your Junior .NET Interview',
       language: 'markdown',
       content: `# Welcome to your junior .NET interview
 
-You will work through nine short exercises. Each one is intended to take about
+You will work through ten short exercises. Each one is intended to take about
 five minutes. The goal is to understand how you approach a problem—not to test
 whether you have memorized every piece of syntax.
 
@@ -708,6 +792,7 @@ whether you have memorized every piece of syntax.
 7. C# — REST API Basics
 8. SOLID — Single Responsibility
 9. AI — Prompt a Coding Assistant
+10. HTML/CSS — Responsive Policy Card
 
 ## How to approach each exercise
 
@@ -723,11 +808,11 @@ reasoning, honest communication, and learning from a hint are all valuable.`,
       answerKey: `OVERALL GRADING
 Each exercise has a 0–3 score in its own Answer Key.
 
-Suggested total for 9 questions: 27 points
-24–27 — Strong junior performance
-18–23 — Reasonable junior performance; discuss weak areas
-11–17 — Significant gaps; consider experience claims carefully
-0–10  — Fundamentals were not demonstrated
+Suggested total for 10 questions: 30 points
+27–30 — Strong junior performance
+20–26 — Reasonable junior performance; discuss weak areas
+12–19 — Significant gaps; consider experience claims carefully
+0–11  — Fundamentals were not demonstrated
 
 This is only a guide. Communication, honesty, response to hints, and ability
 to explain their own resume should influence the final decision.
