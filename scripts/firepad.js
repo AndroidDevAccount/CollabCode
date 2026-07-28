@@ -253,7 +253,7 @@
       const currentLanguage = document.getElementById('language-selector')?.value || 'javascript';
       firepad = Firepad.fromACE(firepadRef, editor, {
         // New interviews start blank; the interviewer deliberately chooses a
-        // question from Interview Tools when they are ready.
+        // question from Load Questions when they are ready.
         defaultText: isNew && !currentUser.isAdmin ? getDefaultCode(currentLanguage) : '',
         userId: currentUser.id
       });
@@ -625,7 +625,7 @@
         }
 
         function renderQuestionSetPicker() {
-          templateSelector.replaceChildren(new Option('Interview Tools', ''));
+          templateSelector.replaceChildren(new Option('Load Questions', ''));
 
           const includedGroup = document.createElement('optgroup');
           includedGroup.label = 'Included Questions';
@@ -658,7 +658,7 @@
             return;
           }
 
-          templateSelector.replaceChildren(new Option(set.title, ''));
+          templateSelector.replaceChildren();
           set.questions.forEach(questionKey => {
             const template = window.InterviewTemplates[questionKey];
             if (template) {
@@ -700,6 +700,10 @@
               questionSets[activeQuestionSetKey].questions.includes(savedQuestionKey)) {
             activeInterviewTemplateKey = savedQuestionKey;
           }
+          if (activeQuestionSetKey && !activeInterviewTemplateKey) {
+            const firstQuestion = questionSets[activeQuestionSetKey].questions[0];
+            if (firstQuestion) loadInterviewTemplate(firstQuestion);
+          }
           if (activeQuestionSetKey) renderLoadedQuestions();
           else renderQuestionSetPicker();
         } catch (error) {
@@ -736,6 +740,8 @@
                 questionSet: activeQuestionSetKey,
                 activeQuestionTemplate: null
               });
+              const firstQuestion = questionSets[activeQuestionSetKey]?.questions[0];
+              if (firstQuestion) loadInterviewTemplate(firstQuestion);
               renderLoadedQuestions();
               showNotification(`Saved "${importedSet.name}" with ${importedSet.questions.length} questions.`);
             } catch (error) {
@@ -789,6 +795,8 @@
               questionSet: activeQuestionSetKey,
               activeQuestionTemplate: null
             });
+            const firstQuestion = questionSets[activeQuestionSetKey].questions[0];
+            if (firstQuestion) loadInterviewTemplate(firstQuestion);
             renderLoadedQuestions();
             return;
           }
