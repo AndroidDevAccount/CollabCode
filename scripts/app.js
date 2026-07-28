@@ -205,6 +205,92 @@
     const closeSessionsModalBtn = document.getElementById('closeSessionsModalBtn');
     const interviewerNameInput = document.getElementById('interviewerName');
     const returnToInterviewBtn = document.getElementById('returnToInterviewBtn');
+    const manageAdminsBtn = document.getElementById('manageAdminsBtn');
+    const manageAdminsModal = document.getElementById('manageAdminsModal');
+    const closeManageAdminsBtn = document.getElementById('closeManageAdminsBtn');
+    const addAdminForm = document.getElementById('addAdminForm');
+
+    async function loadAdmins() {
+      const list = document.getElementById('adminList');
+      const message = document.getElementById('adminManagerMessage');
+      if (!list) return;
+      list.textContent = 'Loading admins…';
+      try {
+        const response = await fetch('/api/admins', {
+          headers: Auth.getAuthHeaders()
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Could not load admins');
+        list.replaceChildren();
+        data.admins.forEach(account => {
+          const row = document.createElement('div');
+          row.className = 'admin-list-row';
+          const email = document.createElement('span');
+          email.textContent = account.email;
+          const role = document.createElement('strong');
+          role.textContent = account.owner ? 'Owner' : 'Admin';
+          row.append(email, role);
+          list.appendChild(row);
+        });
+      } catch (error) {
+        list.textContent = '';
+        if (message) message.textContent = error.message;
+      }
+    }
+
+    if (manageAdminsBtn && !manageAdminsBtn.dataset.bound) {
+      manageAdminsBtn.dataset.bound = 'true';
+      manageAdminsBtn.addEventListener('click', function() {
+        manageAdminsModal.style.display = 'flex';
+        loadAdmins();
+      });
+    }
+
+    if (closeManageAdminsBtn && !closeManageAdminsBtn.dataset.bound) {
+      closeManageAdminsBtn.dataset.bound = 'true';
+      closeManageAdminsBtn.addEventListener('click', function() {
+        manageAdminsModal.style.display = 'none';
+      });
+    }
+
+    if (addAdminForm && !addAdminForm.dataset.bound) {
+      addAdminForm.dataset.bound = 'true';
+      addAdminForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const message = document.getElementById('adminManagerMessage');
+        const submit = this.querySelector('button[type="submit"]');
+        submit.disabled = true;
+        if (message) message.textContent = '';
+        try {
+          const response = await fetch('/api/admins', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...Auth.getAuthHeaders()
+            },
+            body: JSON.stringify({
+              email: document.getElementById('newAdminEmail').value,
+              password: document.getElementById('newAdminPassword').value
+            })
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || 'Could not add admin');
+          this.reset();
+          if (message) {
+            message.style.color = '#067647';
+            message.textContent = `Added ${data.admin.email}`;
+          }
+          await loadAdmins();
+        } catch (error) {
+          if (message) {
+            message.style.color = '#b42318';
+            message.textContent = error.message;
+          }
+        } finally {
+          submit.disabled = false;
+        }
+      });
+    }
 
     if (returnToInterviewBtn && !returnToInterviewBtn.dataset.bound) {
       returnToInterviewBtn.dataset.bound = 'true';

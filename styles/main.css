@@ -808,6 +808,7 @@ html, body {
   justify-content: space-between;
   align-items: center;
   min-height: 50px;
+  gap: 12px;
 }
 
 .left-controls, .right-controls {
@@ -857,6 +858,82 @@ html, body {
   min-width: 160px;
   max-width: 200px;
   margin-left: 5px;
+}
+
+#interview-tools-menu {
+  position: relative;
+}
+
+#interview-tools-menu summary {
+  list-style: none;
+  padding: 8px 12px;
+  background: #1e1e1e;
+  color: #eee;
+  border: 1px solid #555;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#interview-tools-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+#interview-tools-menu summary::after {
+  content: " ▾";
+}
+
+#interview-tools-menu[open] summary::after {
+  content: " ▴";
+}
+
+.interview-tools-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 500;
+  width: 320px;
+  padding: 14px;
+  display: grid;
+  gap: 8px;
+  background: #252525;
+  border: 1px solid #555;
+  border-radius: 8px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .5);
+  text-align: left;
+}
+
+.interview-tools-popover label {
+  color: #aaa;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+#top-bar .interview-tools-popover select {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.interview-menu-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.interview-menu-actions button,
+.interview-menu-dashboard {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  color: white;
+  background: #3a3a3a;
+  cursor: pointer;
+}
+
+.interview-menu-dashboard {
+  width: 100%;
+  background: #0069b4;
 }
 
 #answer-key-btn {
@@ -2370,12 +2447,16 @@ a.powered-by-firepad {
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  max-height: calc(100vh - 32px);
+  display: flex;
+  flex-direction: column;
 }
 
 .dashboard-header-modern {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 32px;
   color: white;
+  flex-shrink: 0;
 }
 
 .dashboard-header-content {
@@ -2422,6 +2503,7 @@ a.powered-by-firepad {
 .dashboard-body {
   padding: 32px;
   background: #f8f9fa;
+  overflow-y: auto;
 }
 
 /* Interviewer Card */
@@ -2700,6 +2782,48 @@ a.powered-by-firepad {
   text-align: center;
   padding-top: 24px;
   border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-manager-content {
+  max-width: 680px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  text-align: left;
+}
+
+.admin-manager-help {
+  color: #666;
+  margin-bottom: 18px;
+}
+
+.admin-add-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.admin-manager-message {
+  min-height: 24px;
+  margin: 12px 0;
+  color: #b42318;
+}
+
+.admin-list {
+  border-top: 1px solid #ddd;
+}
+
+.admin-list-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 4px;
+  border-bottom: 1px solid #eee;
+  color: #222;
 }
 
 .tool-btn {

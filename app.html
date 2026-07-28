@@ -339,8 +339,29 @@
               <span>Session Manager</span>
               <span class="tool-badge">View All</span>
             </button>
+            <button id="manageAdminsBtn" class="tool-btn">
+              <span>Manage Admins</span>
+              <span class="tool-badge">Access</span>
+            </button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div id="manageAdminsModal" class="modal" style="display: none; z-index: 1200;">
+      <div class="modal-content admin-manager-content">
+        <div class="modal-header">
+          <h2>Manage Admins</h2>
+          <button id="closeManageAdminsBtn" class="close-modal-btn">×</button>
+        </div>
+        <p class="admin-manager-help">Add another interviewer who can create and manage sessions.</p>
+        <form id="addAdminForm" class="admin-add-form">
+          <input id="newAdminEmail" type="email" class="modern-input" placeholder="interviewer@example.com" required>
+          <input id="newAdminPassword" type="password" class="modern-input" placeholder="Password (8+ characters)" minlength="8" required>
+          <button type="submit" class="action-btn-primary">Add Admin</button>
+        </form>
+        <div id="adminManagerMessage" class="admin-manager-message"></div>
+        <div id="adminList" class="admin-list">Loading admins…</div>
       </div>
     </div>
 
@@ -563,42 +584,49 @@
             </optgroup>
           </select>
 
-          <select id="question-set-selector" title="Choose Question Set" style="display: none;">
-            <option value="">Choose question set…</option>
-          </select>
-          <select id="template-selector" title="Load Interview Question" style="display: none;">
-            <option value="">Load question…</option>
-          </select>
-          <button id="import-question-set-btn" type="button" style="display: none;" title="Import a JSON question set">Import Set</button>
-          <input id="question-set-file-input" type="file" accept=".json,application/json" hidden>
-          <button id="answer-key-btn" type="button" style="display: none;" disabled>
-            Answer Key
-          </button>
-          
-          <select id="theme-selector">
-            <option value="monokai">Monokai</option>
-            <option value="github">GitHub</option>
-            <option value="tomorrow">Tomorrow</option>
-            <option value="twilight">Twilight</option>
-            <option value="solarized_dark">Solarized Dark</option>
-            <option value="solarized_light">Solarized Light</option>
-            <option value="textmate">TextMate</option>
-            <option value="terminal">Terminal</option>
-          </select>
-
-          <select id="fontSize-selector">
-            <option value="12">12px</option>
-            <option value="14" selected>14px</option>
-            <option value="16">16px</option>
-            <option value="18">18px</option>
-            <option value="20">20px</option>
-          </select>
+          <details id="interview-tools-menu" style="display: none;">
+            <summary>Interview Tools</summary>
+            <div class="interview-tools-popover">
+              <label>Question set</label>
+              <select id="question-set-selector" title="Choose Question Set" style="display: none;">
+                <option value="">Choose question set…</option>
+              </select>
+              <label>Question</label>
+              <select id="template-selector" title="Load Interview Question" style="display: none;">
+                <option value="">Load question…</option>
+              </select>
+              <div class="interview-menu-actions">
+                <button id="import-question-set-btn" type="button" style="display: none;">Import Set</button>
+                <button id="answer-key-btn" type="button" style="display: none;" disabled>Answer Key</button>
+              </div>
+              <input id="question-set-file-input" type="file" accept=".json,application/json" hidden>
+              <label>Editor theme</label>
+              <select id="theme-selector">
+                <option value="monokai">Monokai</option>
+                <option value="github">GitHub</option>
+                <option value="tomorrow">Tomorrow</option>
+                <option value="twilight">Twilight</option>
+                <option value="solarized_dark">Solarized Dark</option>
+                <option value="solarized_light">Solarized Light</option>
+                <option value="textmate">TextMate</option>
+                <option value="terminal">Terminal</option>
+              </select>
+              <label>Font size</label>
+              <select id="fontSize-selector">
+                <option value="12">12px</option>
+                <option value="14" selected>14px</option>
+                <option value="16">16px</option>
+                <option value="18">18px</option>
+                <option value="20">20px</option>
+              </select>
+              <button id="dashboard-btn" type="button" class="interview-menu-dashboard" style="display: none;">Open Dashboard</button>
+            </div>
+          </details>
         </div>
 
         <div class="center-info">
           <img src="/images/favicon/apple-touch-icon-57x57.png" alt="Atom Tickets" width="24" height="24" style="margin-right: 8px; vertical-align: middle;">
           <span id="session-info"></span>
-          <button id="dashboard-btn" type="button" class="dashboard-session-button" style="display: none;">Dashboard</button>
           <button id="end-session-btn" class="end-session-button" style="margin-left: 15px;">End Interview</button>
           <span id="user-count" class="user-count"></span>
         </div>
