@@ -99,6 +99,7 @@
     // Update UI based on role
     const endSessionBtn = document.getElementById('end-session-btn');
     const dashboardBtn = document.getElementById('dashboard-btn');
+    const shareBtn = document.getElementById('share-btn');
     
     if (isAdmin) {
       console.log('Admin user detected - showing End Interview button');
@@ -112,6 +113,7 @@
         console.log('End Interview button is visible for admin');
       }
       if (dashboardBtn) dashboardBtn.style.display = 'inline-block';
+      if (shareBtn) shareBtn.style.display = 'inline-block';
     } else {
       console.log('Non-admin user - hiding End Interview button');
       // Hide button for non-admin users
@@ -119,6 +121,7 @@
         endSessionBtn.style.display = 'none';
       }
       if (dashboardBtn) dashboardBtn.style.display = 'none';
+      if (shareBtn) shareBtn.style.display = 'none';
     }
   }
 
@@ -980,6 +983,7 @@
 
   // Share session
   function shareSession() {
+    if (!currentUser?.isAdmin) return;
     const shareMessage = `Join my coding session!\n\nSession Code: ${currentSessionCode}\n\nGo to: ${window.location.origin}\nEnter code: ${currentSessionCode}`;
     
     if (navigator.clipboard && navigator.clipboard.writeText) {
