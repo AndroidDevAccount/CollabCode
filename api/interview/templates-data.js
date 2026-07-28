@@ -771,11 +771,11 @@ it communicates the context, desired outcome, constraints, and verification.`
       language: 'html',
       content: `<!-- 5-minute HTML/CSS question
 
-The HTML below displays a policy summary. The existing CSS makes the card too
-wide, gives the content no breathing room, and has no visible border.
+The HTML below displays a policy summary. The card needs a set width, some
+breathing room around its content, and a visible border.
 
 Update only the CSS to:
-1. Let the card use the available width but never exceed 400px.
+1. Make the card 400px wide.
 2. Add 16px of space inside the card.
 3. Add a 1px solid gray border and 8px rounded corners.
 4. On screens 480px wide or smaller, make the button fill the card width.
@@ -784,7 +784,6 @@ Update only the CSS to:
 <style>
     /* Existing CSS — edit this */
     .policy-card {
-        width: 700px;
         padding: 0;
         border: none;
     }
@@ -804,18 +803,15 @@ Update only the CSS to:
     <button class="details-button">View details</button>
 </article>`,
       answerKey: `PLAIN-ENGLISH ANSWER
-width: 100% lets the card shrink to fit its container. max-width: 400px stops
-it from becoming wider than 400px on a large screen. Padding adds space inside
-the border. The media query changes the button only on small screens.
+width sets the card's width. Padding adds space between the content and the
+border. The media query changes the button only on small screens.
 
 ONE GOOD SOLUTION
 .policy-card {
-    width: 100%;
-    max-width: 400px;
+    width: 400px;
     padding: 16px;
     border: 1px solid gray;
     border-radius: 8px;
-    box-sizing: border-box;
 }
 
 .details-button {
@@ -828,14 +824,9 @@ ONE GOOD SOLUTION
     }
 }
 
-WHY BOX-SIZING HELPS
-With box-sizing: border-box, the declared width includes the padding and border.
-Without it, a width: 100% element can become slightly wider than its container.
-Treat this as a useful bonus, not a requirement unless overflow occurs.
-
 HOW TO GRADE (0-3)
-3 — Adds responsive width/max-width, padding, border, rounded corners, and the
-    mobile button rule.
+3 — Adds the 400px width, padding, border, rounded corners, and the mobile
+    button rule.
 2 — Completes most changes but misses one detail or makes a minor syntax error.
 1 — Can add basic padding or border but cannot make the card responsive.
 0 — Does not know which CSS properties control these visible changes.
