@@ -397,9 +397,34 @@ public class PolicyService
 // Responsibility 2:
 // Interface 1:
 // Interface 2:`,
-      answerKey: `PLAIN-ENGLISH ANSWER
-The class has two jobs: storing policy data and sending email. Separating them
-makes each part easier to change and test.
+      answerKey: `WHAT IS SOLID?
+SOLID is a set of five guidelines for organizing object-oriented code so it is
+easier to change, test, and maintain:
+
+S — Single Responsibility:
+    A class should have one main job or one reason to change.
+O — Open/Closed:
+    Add new behavior without repeatedly rewriting stable existing code.
+L — Liskov Substitution:
+    A replacement implementation should work wherever its interface is expected.
+I — Interface Segregation:
+    Prefer small, focused interfaces over one large interface with unrelated jobs.
+D — Dependency Inversion:
+    Business code should depend on interfaces, not directly on database or email
+    implementations.
+
+Do not expect the candidate to recite all five definitions. This exercise mainly
+tests the S: Single Responsibility Principle.
+
+WHAT IS WRONG WITH THIS CLASS?
+PolicyService has two unrelated jobs:
+1. Storing policy data in SQL Server.
+2. Sending an email notification.
+
+It therefore has two reasons to change. A database change and an email-provider
+change would both require editing the same class. Separating those jobs also
+makes the code easier to test: a test can substitute fake implementations
+instead of connecting to a real database or sending a real email.
 
 ONE GOOD ANSWER
 // Responsibility 1: Save/read policy data.
@@ -407,13 +432,31 @@ ONE GOOD ANSWER
 // Interface 1: IPolicyRepository
 // Interface 2: IEmailService (or INotificationService)
 
+WHAT "INJECT THE INTERFACES" MEANS
+The class receives the two helpers, usually through its constructor, instead of
+creating a SQL connection or email sender itself:
+
+public PolicyService(
+    IPolicyRepository policies,
+    IEmailService email)
+{
+    _policies = policies;
+    _email = email;
+}
+
+CreatePolicy would then call _policies.Save(policy) and
+_email.SendConfirmation(policy.CustomerEmail). The exact names do not matter.
+
 HOW TO GRADE (0–3)
 3 — Clearly identifies both jobs and proposes two sensible interfaces.
 2 — Identifies both jobs but names only one interface or needs a hint.
 1 — Says "too much in one class" without identifying the two jobs.
 0 — Cannot see any reason to separate database and email work.
 
-Do not require memorized SOLID definitions. Practical reasoning is better.`
+INTERVIEWER TIP
+Give full credit for names such as IPolicyDataService, IRepository,
+INotificationService, or IMailer when their intended jobs are clear. Practical
+reasoning matters more than memorizing the acronym.`
     },
 
     'csharp-debugging': {
