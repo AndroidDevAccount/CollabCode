@@ -10,10 +10,45 @@
     setupLandingPage();
     setupCandidateFlow();
     setupAdminFlow();
+    setupDashboardDismissal();
 
     if (Auth.isAdmin()) {
       restoreAdminDashboard();
     }
+  }
+
+  function setupDashboardDismissal() {
+    const dashboard = document.getElementById('adminDashboardModal');
+    const returnButton = document.getElementById('returnToInterviewBtn');
+    const closeButton = document.getElementById('closeDashboardBtn');
+
+    function returnToInterview() {
+      if (dashboard) dashboard.style.display = 'none';
+    }
+
+    [returnButton, closeButton].forEach(button => {
+      if (button && !button.dataset.dismissBound) {
+        button.dataset.dismissBound = 'true';
+        button.addEventListener('click', returnToInterview);
+      }
+    });
+
+    if (dashboard && !dashboard.dataset.dismissBound) {
+      dashboard.dataset.dismissBound = 'true';
+      dashboard.addEventListener('click', function(event) {
+        if (event.target === dashboard && returnButton?.style.display !== 'none') {
+          returnToInterview();
+        }
+      });
+    }
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' &&
+          dashboard?.style.display === 'flex' &&
+          returnButton?.style.display !== 'none') {
+        returnToInterview();
+      }
+    });
   }
 
   async function restoreAdminDashboard() {
@@ -204,7 +239,6 @@
     const viewAllSessionsBtn = document.getElementById('viewAllSessionsBtn');
     const closeSessionsModalBtn = document.getElementById('closeSessionsModalBtn');
     const interviewerNameInput = document.getElementById('interviewerName');
-    const returnToInterviewBtn = document.getElementById('returnToInterviewBtn');
     const manageAdminsBtn = document.getElementById('manageAdminsBtn');
     const manageAdminsModal = document.getElementById('manageAdminsModal');
     const closeManageAdminsBtn = document.getElementById('closeManageAdminsBtn');
@@ -289,13 +323,6 @@
         } finally {
           submit.disabled = false;
         }
-      });
-    }
-
-    if (returnToInterviewBtn && !returnToInterviewBtn.dataset.bound) {
-      returnToInterviewBtn.dataset.bound = 'true';
-      returnToInterviewBtn.addEventListener('click', function() {
-        document.getElementById('adminDashboardModal').style.display = 'none';
       });
     }
 

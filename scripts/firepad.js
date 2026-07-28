@@ -783,6 +783,7 @@
         }));
         const dashboard = document.getElementById('adminDashboardModal');
         const returnButton = document.getElementById('returnToInterviewBtn');
+        const closeButton = document.getElementById('closeDashboardBtn');
         const activeSession = document.getElementById('activeSession');
         const activeSessionCode = document.getElementById('activeSessionCode');
         if (activeSessionCode) activeSessionCode.textContent = currentSessionCode;
@@ -794,6 +795,7 @@
           if (heading) heading.textContent = 'Active Session';
         }
         if (returnButton) returnButton.style.display = 'inline-block';
+        if (closeButton) closeButton.style.display = 'inline-flex';
         if (dashboard) dashboard.style.display = 'flex';
         document.getElementById('interview-tools-menu')?.removeAttribute('open');
       });
