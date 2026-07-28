@@ -2506,6 +2506,24 @@ a.powered-by-firepad {
   overflow-y: auto;
 }
 
+.dashboard-close-btn {
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  color: white;
+  background: rgba(255, 255, 255, 0.2);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.dashboard-close-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
 /* Interviewer Card */
 .interviewer-card {
   display: flex;
