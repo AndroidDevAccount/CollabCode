@@ -558,19 +558,8 @@
             </optgroup>
           </select>
 
-          <select id="template-selector" title="Load Interview Question">
+          <select id="template-selector" title="Load Interview Question" style="display: none;">
             <option value="">Load .NET question…</option>
-            <option value="csharp-warmup">C# — Very Simple Warm-up</option>
-            <option value="csharp-rest-api">C# — Public REST API Test</option>
-            <option value="aspnet-mvc">ASP.NET MVC — Controller Design</option>
-            <option value="sql-policy-query">SQL Server — Policy Query</option>
-            <option value="ef-linq">LINQ — Employee Filter</option>
-            <option value="ef-migration">Entity Framework — Add Field & Migration</option>
-            <option value="solid-refactor">SOLID — Refactoring</option>
-            <option value="csharp-debugging">C# — Easy Running Sum</option>
-            <option value="ai-prompting">AI — Prompt a Coding Assistant</option>
-            <option value="frontend-css">HTML/CSS — Responsive Policy Card</option>
-            <option value="dotnet-interview-plan">Candidate Interview Overview</option>
           </select>
           <button id="answer-key-btn" type="button" style="display: none;" disabled>
             Answer Key
@@ -734,14 +723,13 @@
 
     <!-- Simple Templates (must load before firepad.js) -->
     <script src="scripts/simple-templates.js?v=2"></script>
-    <script src="scripts/interview-templates.js?v=14"></script>
     <script src="scripts/custom-dialogs.js?v=2"></script>
     <script src="scripts/firepad.js?v=6"></script>
     <script src="scripts/interview-notes.js?v=4"></script>
     <script src="scripts/slack-integration.js?v=4"></script>
     <script src="scripts/posthog-tracking.js?v=2"></script>
     <script src="scripts/session-tracking.js?v=1"></script>
-    <script src="scripts/activity-monitor.js?v=2"></script>
+    <script src="scripts/activity-monitor.js?v=3"></script>
     <script src="scripts/app.js?v=3"></script>
   </body>
 </html>
