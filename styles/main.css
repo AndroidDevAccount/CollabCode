@@ -855,87 +855,10 @@ html, body {
 }
 
 #template-selector {
-  min-width: 160px;
-  max-width: 200px;
-  margin-left: 5px;
-}
-
-#interview-tools-menu {
-  position: relative;
-}
-
-#interview-tools-menu summary {
-  list-style: none;
-  padding: 8px 12px;
-  background: #1e1e1e;
-  color: #eee;
-  border: 1px solid #555;
-  border-radius: 4px;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-#interview-tools-menu summary::-webkit-details-marker {
-  display: none;
-}
-
-#interview-tools-menu summary::after {
-  content: " ▾";
-}
-
-#interview-tools-menu[open] summary::after {
-  content: " ▴";
-}
-
-.interview-tools-popover {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  z-index: 500;
-  width: 320px;
-  padding: 14px;
-  display: grid;
-  gap: 8px;
-  background: #252525;
-  border: 1px solid #555;
-  border-radius: 8px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, .5);
-  text-align: left;
-}
-
-.interview-tools-popover label {
-  color: #aaa;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-#top-bar .interview-tools-popover select {
-  width: 100%;
-  max-width: none;
-  margin: 0;
-}
-
-.custom-questions-button {
-  width: 100%;
-  padding: 8px 10px;
-  border: 1px solid #555;
-  border-radius: 4px;
-  color: white;
-  background: #3a3a3a;
-  cursor: pointer;
-}
-
-.interview-tools-heading {
-  margin-top: 2px;
-  color: #f3f3f3;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.custom-questions-heading {
-  margin-top: 8px;
-  padding-top: 10px;
-  border-top: 1px solid #444;
+  width: 180px;
+  min-width: 150px;
+  max-width: 180px;
+  margin-left: 0;
 }
 
 #answer-key-btn:disabled {
@@ -2039,6 +1962,12 @@ a.powered-by-firepad {
 .notes-button.active {
   background: #018ef5;
   border-color: #018ef5;
+}
+
+#answer-key-btn.active {
+  background: #3a3a3a;
+  border-color: #555;
+  color: #4caf50;
 }
 
 /* Save status indicator */

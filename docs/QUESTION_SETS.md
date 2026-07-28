@@ -1,9 +1,9 @@
 # Custom interview question sets
 
-Administrators open **Interview Tools** and use the single question menu under
-**Included Questions**. Questions are grouped under their built-in or custom set
-name. Under **Custom Questions**, select **Add Questions from File** to load a
-JSON file containing another group.
+Administrators use the **Interview Questions** dropdown in the editor toolbar.
+Included questions are grouped by their built-in set. The **Custom Questions**
+group contains imported questions and an **Add questions from file…** option for
+loading another JSON file.
 
 An imported file has this shape:
 
