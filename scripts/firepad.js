@@ -317,6 +317,7 @@
     userRef.set({
       name: currentUser.name,
       color: currentUser.color,
+      isAdmin: currentUser.isAdmin === true,
       timestamp: firebase.database.ServerValue.TIMESTAMP
     });
 
@@ -443,14 +444,61 @@
     usersList.innerHTML = '';
     Object.keys(users).forEach(userId => {
       const user = users[userId];
-      const badge = document.createElement('div');
+      const isCurrentUser = userId === currentUser.id;
+      const isAdmin = user.isAdmin === true ||
+        (isCurrentUser && currentUser.isAdmin === true);
+      const badge = document.createElement(
+        isCurrentUser && isAdmin ? 'button' : 'div'
+      );
       badge.className = 'user-badge';
-      if (userId === currentUser.id) {
+      if (isCurrentUser) {
         badge.className += ' current-user';
       }
-      badge.textContent = user.name;
+      if (isCurrentUser && isAdmin) {
+        badge.className += ' admin-menu-trigger';
+        badge.type = 'button';
+        badge.setAttribute('aria-haspopup', 'true');
+        badge.setAttribute('aria-expanded', 'false');
+      }
+      badge.textContent = isCurrentUser && isAdmin
+        ? 'Admin'
+        : `${isAdmin ? 'Admin' : 'Candidate'}: ${user.name}`;
+      badge.title = isCurrentUser && isAdmin
+        ? 'Open admin menu'
+        : `${isAdmin ? 'Admin' : 'Candidate'} currently connected`;
       badge.style.borderLeft = `3px solid ${user.color}`;
       usersList.appendChild(badge);
+
+      if (isCurrentUser && isAdmin) {
+        const menu = document.createElement('div');
+        menu.className = 'admin-pill-menu';
+        menu.hidden = true;
+
+        [
+          ['Dashboard', () => document.getElementById('dashboard-btn')?.click()],
+          ['Manage Admins', () => {
+            document.getElementById('dashboard-btn')?.click();
+            setTimeout(() => document.getElementById('manageAdminsBtn')?.click(), 0);
+          }],
+          ['Logout', () => {
+            Auth.logout();
+            window.location.hash = '';
+            window.location.reload();
+          }]
+        ].forEach(([label, action]) => {
+          const item = document.createElement('button');
+          item.type = 'button';
+          item.textContent = label;
+          item.addEventListener('click', action);
+          menu.appendChild(item);
+        });
+
+        badge.addEventListener('click', function() {
+          menu.hidden = !menu.hidden;
+          badge.setAttribute('aria-expanded', String(!menu.hidden));
+        });
+        usersList.appendChild(menu);
+      }
     });
   }
 

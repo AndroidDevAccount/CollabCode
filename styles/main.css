@@ -1006,6 +1006,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 8px;
+  position: relative;
 }
 
 .user-badge {
@@ -1029,6 +1030,47 @@ html, body {
 
 .user-badge.current-user {
   background: #007acc;
+}
+
+button.user-badge {
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.admin-pill-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 600;
+  width: 170px;
+  padding: 6px;
+  background: #292929;
+  border: 1px solid #555;
+  border-radius: 8px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .45);
+}
+
+.admin-pill-menu[hidden] {
+  display: none;
+}
+
+.admin-pill-menu button {
+  display: block;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #eee;
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-pill-menu button:hover {
+  background: #3d3d3d;
 }
 
 /* Editor Wrapper */
