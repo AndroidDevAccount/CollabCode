@@ -22,6 +22,7 @@ const routes = {
   '/api/firebase-config.js': () => require('./api/firebase-config'),
   '/api/code/execute': () => require('./api/code/execute'),
   '/api/interview/templates': () => require('./api/interview/templates'),
+  '/api/admins': () => require('./api/admins'),
   '/api/activity/save': () => require('./api/activity/save'),
   '/api/slack/send': () => require('./api/slack/send'),
   '/api/check-duplicate-login': () => require('./api/check-duplicate-login'),

@@ -5,6 +5,22 @@
 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const admin = require('firebase-admin');
+
+if (!admin.apps.length && process.env.FIREBASE_PROJECT_ID) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+    }),
+    databaseURL: process.env.FIREBASE_DATABASE_URL
+  });
+}
+
+function emailKey(email) {
+  return Buffer.from(email.trim().toLowerCase()).toString('base64url');
+}
 
 // Admin credentials (use environment variables in production)
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
@@ -41,11 +57,6 @@ module.exports = async (req, res) => {
     }
   }
 
-  // Debug logging (remove in production)
-  console.log('Request body type:', typeof req.body);
-  console.log('Request body:', req.body);
-  console.log('Parsed body:', body);
-
   const { email, password } = body || {};
 
   if (!email || !password) {
@@ -61,13 +72,21 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // Check email
-    if (email !== ADMIN_EMAIL) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+    const normalizedEmail = String(email).trim().toLowerCase();
+    const ownerLogin = normalizedEmail === String(ADMIN_EMAIL).trim().toLowerCase();
+    let passwordHash = ownerLogin ? ADMIN_PASSWORD_HASH : null;
+
+    if (!ownerLogin && admin.apps.length) {
+      const snapshot = await admin.database()
+        .ref(`adminAccounts/${emailKey(normalizedEmail)}`)
+        .once('value');
+      const account = snapshot.val();
+      if (account && account.disabled !== true) passwordHash = account.passwordHash;
     }
 
-    // Verify password
-    const validPassword = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
+    const validPassword = passwordHash
+      ? await bcrypt.compare(password, passwordHash)
+      : false;
     if (!validPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
@@ -75,7 +94,7 @@ module.exports = async (req, res) => {
     // Generate token
     const token = jwt.sign(
       {
-        email: email,
+        email: normalizedEmail,
         isAdmin: true,
         userId: 'admin-' + Date.now()
       },
@@ -86,7 +105,7 @@ module.exports = async (req, res) => {
     res.status(200).json({
       success: true,
       token: token,
-      user: { email: email, isAdmin: true }
+      user: { email: normalizedEmail, isAdmin: true }
     });
   } catch (error) {
     console.error('Login error:', error);

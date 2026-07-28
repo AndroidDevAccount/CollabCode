@@ -99,6 +99,7 @@
     // Update UI based on role
     const endSessionBtn = document.getElementById('end-session-btn');
     const dashboardBtn = document.getElementById('dashboard-btn');
+    const interviewToolsMenu = document.getElementById('interview-tools-menu');
     
     if (isAdmin) {
       console.log('Admin user detected - showing End Interview button');
@@ -112,6 +113,7 @@
         console.log('End Interview button is visible for admin');
       }
       if (dashboardBtn) dashboardBtn.style.display = 'inline-block';
+      if (interviewToolsMenu) interviewToolsMenu.style.display = 'block';
     } else {
       console.log('Non-admin user - hiding End Interview button');
       // Hide button for non-admin users
@@ -119,6 +121,7 @@
         endSessionBtn.style.display = 'none';
       }
       if (dashboardBtn) dashboardBtn.style.display = 'none';
+      if (interviewToolsMenu) interviewToolsMenu.style.display = 'none';
     }
   }
 
@@ -710,6 +713,7 @@
         templateSelector.addEventListener('change', function() {
           loadInterviewTemplate(this.value);
           this.value = '';
+          document.getElementById('interview-tools-menu')?.removeAttribute('open');
         });
 
         if (answerKeyButton) {
@@ -722,6 +726,7 @@
             } else {
               closeAnswerKeyPanel();
             }
+            document.getElementById('interview-tools-menu')?.removeAttribute('open');
           });
         }
 
@@ -814,10 +819,25 @@
     if (dashboardBtn) {
       dashboardBtn.addEventListener('click', function() {
         if (!currentUser?.isAdmin) return;
+        localStorage.setItem('recent_admin_session', JSON.stringify({
+          code: currentSessionCode,
+          lastOpenedAt: Date.now()
+        }));
         const dashboard = document.getElementById('adminDashboardModal');
         const returnButton = document.getElementById('returnToInterviewBtn');
+        const activeSession = document.getElementById('activeSession');
+        const activeSessionCode = document.getElementById('activeSessionCode');
+        if (activeSessionCode) activeSessionCode.textContent = currentSessionCode;
+        if (activeSession) {
+          activeSession.style.display = 'block';
+          const badge = activeSession.querySelector('.session-status-badge');
+          const heading = activeSession.querySelector('h4');
+          if (badge) badge.textContent = 'LIVE';
+          if (heading) heading.textContent = 'Active Session';
+        }
         if (returnButton) returnButton.style.display = 'inline-block';
         if (dashboard) dashboard.style.display = 'flex';
+        document.getElementById('interview-tools-menu')?.removeAttribute('open');
       });
     }
 
