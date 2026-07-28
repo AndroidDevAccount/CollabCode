@@ -621,7 +621,8 @@
         <div class="center-info">
           <img src="/images/favicon/apple-touch-icon-57x57.png" alt="Atom Tickets" width="24" height="24" style="margin-right: 8px; vertical-align: middle;">
           <span id="session-info"></span>
-          <button id="end-session-btn" class="end-session-button" style="margin-left: 15px;">End Interview</button>
+          <button id="dashboard-btn" type="button" class="dashboard-session-button" style="display: none;">Dashboard</button>
+          <button id="end-session-btn" class="end-session-button">End Interview</button>
           <span id="user-count" class="user-count"></span>
         </div>
 
@@ -629,7 +630,6 @@
           <div id="users-list"></div>
           <button id="notes-toggle-btn" class="notes-button" style="display: none;">📝 Notes</button>
           <button id="answer-key-btn" type="button" class="notes-button" style="display: none;" disabled>Answer Key</button>
-          <button id="dashboard-btn" type="button" class="notes-button" style="display: none;">Dashboard</button>
           <button id="run-btn" class="run-button" hidden>▶ Run</button>
           <button id="share-btn">Share</button>
         </div>
@@ -764,7 +764,7 @@
     <script src="scripts/slack-integration.js?v=4"></script>
     <script src="scripts/posthog-tracking.js?v=2"></script>
     <script src="scripts/session-tracking.js?v=1"></script>
-    <script src="scripts/activity-monitor.js?v=3"></script>
-    <script src="scripts/app.js?v=5"></script>
+    <script src="scripts/activity-monitor.js?v=4"></script>
+    <script src="scripts/app.js?v=6"></script>
   </body>
 </html>

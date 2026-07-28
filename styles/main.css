@@ -1065,7 +1065,7 @@ html, body {
   color: white !important;
   border: none !important;
   padding: 6px 14px;
-  border-radius: 4px;
+  border-radius: 999px;
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
@@ -2447,6 +2447,23 @@ a.powered-by-firepad {
   max-height: calc(100vh - 32px);
   display: flex;
   flex-direction: column;
+}
+
+.dashboard-session-button {
+  background-color: #1677d2;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background-color 0.3s;
+  white-space: nowrap;
+}
+
+.dashboard-session-button:hover {
+  background-color: #0d5fae;
 }
 
 .dashboard-header-modern {
