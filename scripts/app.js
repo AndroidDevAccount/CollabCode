@@ -10,45 +10,10 @@
     setupLandingPage();
     setupCandidateFlow();
     setupAdminFlow();
-    setupDashboardDismissal();
 
     if (Auth.isAdmin()) {
       restoreAdminDashboard();
     }
-  }
-
-  function setupDashboardDismissal() {
-    const dashboard = document.getElementById('adminDashboardModal');
-    const returnButton = document.getElementById('returnToInterviewBtn');
-    const closeButton = document.getElementById('closeDashboardBtn');
-
-    function returnToInterview() {
-      if (dashboard) dashboard.style.display = 'none';
-    }
-
-    [returnButton, closeButton].forEach(button => {
-      if (button && !button.dataset.dismissBound) {
-        button.dataset.dismissBound = 'true';
-        button.addEventListener('click', returnToInterview);
-      }
-    });
-
-    if (dashboard && !dashboard.dataset.dismissBound) {
-      dashboard.dataset.dismissBound = 'true';
-      dashboard.addEventListener('click', function(event) {
-        if (event.target === dashboard && returnButton?.style.display !== 'none') {
-          returnToInterview();
-        }
-      });
-    }
-
-    document.addEventListener('keydown', function(event) {
-      if (event.key === 'Escape' &&
-          dashboard?.style.display === 'flex' &&
-          returnButton?.style.display !== 'none') {
-        returnToInterview();
-      }
-    });
   }
 
   async function restoreAdminDashboard() {
@@ -239,10 +204,37 @@
     const viewAllSessionsBtn = document.getElementById('viewAllSessionsBtn');
     const closeSessionsModalBtn = document.getElementById('closeSessionsModalBtn');
     const interviewerNameInput = document.getElementById('interviewerName');
+    const resumeInterviewBtn = document.getElementById('resumeInterviewBtn');
     const manageAdminsBtn = document.getElementById('manageAdminsBtn');
     const manageAdminsModal = document.getElementById('manageAdminsModal');
     const closeManageAdminsBtn = document.getElementById('closeManageAdminsBtn');
     const addAdminForm = document.getElementById('addAdminForm');
+
+    if (resumeInterviewBtn && !resumeInterviewBtn.dataset.bound) {
+      resumeInterviewBtn.dataset.bound = 'true';
+      resumeInterviewBtn.addEventListener('click', function() {
+        const sessionCode = document.getElementById('activeSessionCode')?.textContent.trim();
+        if (!sessionCode) return;
+
+        const dashboard = document.getElementById('adminDashboardModal');
+        const mainContainer = document.getElementById('main-container');
+        dashboard.style.display = 'none';
+
+        if (mainContainer?.dataset.sessionCode === sessionCode) {
+          mainContainer.style.display = 'flex';
+          return;
+        }
+
+        const currentUser = Auth.getCurrentUser();
+        const interviewerName = document.getElementById('interviewerName')?.value.trim();
+        const adminName = interviewerName
+          ? `${interviewerName} (${currentUser.email})`
+          : currentUser.email || 'Interviewer';
+        rememberAdminSession(sessionCode);
+        window.location.hash = sessionCode;
+        startSession(adminName, sessionCode, false);
+      });
+    }
 
     async function loadAdmins() {
       const list = document.getElementById('adminList');
@@ -499,6 +491,7 @@
   function restoreRecentAdminSession() {
     const activeSession = document.getElementById('activeSession');
     const activeSessionCode = document.getElementById('activeSessionCode');
+    const resumeInterviewBtn = document.getElementById('resumeInterviewBtn');
     if (!activeSession || !activeSessionCode) return;
 
     try {
@@ -523,6 +516,7 @@
             const heading = activeSession.querySelector('h4');
             if (badge) badge.textContent = ended ? 'RECENT' : 'LIVE';
             if (heading) heading.textContent = ended ? 'Recent Session' : 'Active Session';
+            if (resumeInterviewBtn) resumeInterviewBtn.style.display = ended ? 'none' : 'inline-block';
           })
           .catch(error => console.error('Failed to restore recent session:', error));
       }
@@ -1821,6 +1815,8 @@
     document.querySelectorAll('.modal').forEach(modal => {
       modal.style.display = 'none';
     });
+    const dashboardPage = document.getElementById('adminDashboardModal');
+    if (dashboardPage) dashboardPage.style.display = 'none';
 
     // Show main container - force it visible
     const mainContainer = document.getElementById('main-container');
@@ -1828,6 +1824,7 @@
       mainContainer.style.display = 'flex';
       mainContainer.style.visibility = 'visible';
       mainContainer.style.opacity = '1';
+      mainContainer.dataset.sessionCode = sessionCode;
       console.log('Main container shown, display:', mainContainer.style.display);
     } else {
       console.error('CRITICAL: main-container element not found in DOM!');
