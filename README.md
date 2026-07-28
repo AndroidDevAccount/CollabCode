@@ -182,6 +182,7 @@ npm run dev
 - **Timestamp Tracking:** Automatic timestamps for observations
 - **Markdown Support:** Format notes with headings, lists, code blocks
 - **Template System:** Use predefined interview question templates
+- **Question Sets:** Choose a focused built-in set or [import custom questions and answer keys](docs/QUESTION_SETS.md)
 - **Collaborative Notes:** Multiple interviewers can add notes simultaneously
 - **Export Options:** Send to Slack, email, or download as PDF/JSON
 

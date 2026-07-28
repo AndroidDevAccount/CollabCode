@@ -1,0 +1,12 @@
+{
+  "name": "Backend Fundamentals",
+  "description": "A short custom interview for backend candidates.",
+  "questions": [
+    {
+      "title": "C# — Calculate a Total",
+      "language": "csharp",
+      "content": "// Ask the candidate to complete this method.\npublic decimal Total(decimal[] values)\n{\n    return 0m;\n}",
+      "answerKey": "A good answer sums the values with a loop or values.Sum().\n\nGrade for a correct result and a clear explanation."
+    }
+  ]
+}
