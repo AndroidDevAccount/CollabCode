@@ -125,6 +125,32 @@
     }
   }
 
+  window.resetCollaborativeSession = function() {
+    try {
+      if (usersRef && currentUser?.id) {
+        usersRef.child(currentUser.id).remove();
+      }
+      if (usersRef) usersRef.off();
+      if (sessionRef) sessionRef.off();
+      if (firepad) firepad.dispose();
+    } catch (error) {
+      console.warn('Session cleanup warning:', error);
+    }
+
+    firepad = null;
+    firepadRef = null;
+    sessionRef = null;
+    usersRef = null;
+    currentSessionCode = null;
+    currentSessionIsNew = false;
+    activeInterviewTemplateKey = null;
+    previousUsers = {};
+    firepadReady = false;
+    isInitialized = false;
+    presenceSetup = false;
+    isFirstUserUpdate = true;
+  };
+
   // Initialize ACE Editor
   function initializeEditor() {
     // Prevent duplicate editor creation
@@ -801,6 +827,9 @@
           if (heading) heading.textContent = 'Active Session';
         }
         if (resumeInterviewButton) resumeInterviewButton.style.display = 'inline-block';
+        if (typeof window.prepareAdminDashboard === 'function') {
+          window.prepareAdminDashboard();
+        }
         if (mainContainer) mainContainer.style.display = 'none';
         if (dashboard) dashboard.style.display = 'flex';
         document.getElementById('interview-tools-menu')?.removeAttribute('open');
