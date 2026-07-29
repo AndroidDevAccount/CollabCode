@@ -266,7 +266,7 @@ npm run dev
 - **Editor:** ACE Editor with Firepad
 - **Authentication:** JWT + bcrypt
 - **Deployment:** Vercel (serverless functions)
-- **Code Execution:** Server-proxied providers (Wandbox Mono for C#; configurable Piston for other languages)
+- **Code Execution:** Piston API
 
 ## 📦 Project Structure
 
@@ -381,8 +381,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [ACE Editor](https://ace.c9.io/) - The high performance code editor
 - [Firebase](https://firebase.google.com/) - Real-time database and hosting
-- [Wandbox](https://wandbox.org/) - C# compilation and execution
-- [Piston](https://github.com/engineer-man/piston) - Optional code execution engine for other languages
+- [Piston](https://github.com/engineer-man/piston) - Code execution engine
 - [Vercel](https://vercel.com/) - Deployment and serverless functions
 
 ## 💬 Support & Community

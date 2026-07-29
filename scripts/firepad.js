@@ -929,13 +929,6 @@
     if (config) {
       session.setMode(config.mode);
     }
-    const runBtn = document.getElementById('run-btn');
-    if (runBtn) {
-      runBtn.hidden = language !== 'csharp';
-      runBtn.title = language === 'csharp'
-        ? 'Compile and run this C# console program'
-        : '';
-    }
   }
 
   // Setup event listeners ONCE
@@ -1216,10 +1209,8 @@
     // Show input section for languages that might need it
     const language = document.getElementById('language-selector').value;
     const inputSection = document.getElementById('input-section');
-    if (['python', 'java', 'c_cpp', 'javascript', 'csharp'].includes(language)) {
+    if (['python', 'java', 'c_cpp', 'javascript'].includes(language)) {
       inputSection.style.display = 'block';
-    } else {
-      inputSection.style.display = 'none';
     }
   }
 
