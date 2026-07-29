@@ -144,16 +144,22 @@ public class TodoClient
 
 public class Program
 {
-    public static async Task Main()
+    public static void Main()
     {
-        using var httpClient = new HttpClient
+        RunAsync().GetAwaiter().GetResult();
+    }
+
+    private static async Task RunAsync()
+    {
+        using (var httpClient = new HttpClient
         {
             BaseAddress = new Uri("https://jsonplaceholder.typicode.com/")
-        };
-
-        var todoClient = new TodoClient(httpClient);
-        string json = await todoClient.GetTodoAsync();
-        Console.WriteLine(json);
+        })
+        {
+            var todoClient = new TodoClient(httpClient);
+            string json = await todoClient.GetTodoAsync();
+            Console.WriteLine(json);
+        }
     }
 }`,
       answerKey: `PLAIN-ENGLISH ANSWER
@@ -214,9 +220,7 @@ BONUS DISCUSSION (do not require)
 // </form>
 
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 
 public class PolicyViewModel
 {
@@ -225,14 +229,83 @@ public class PolicyViewModel
     public string PolicyNumber { get; set; } = "";
 }
 
-[HttpPost]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> Create(PolicyViewModel model)
+public class PolicyController : Controller
 {
-    // TODO 2: If ModelState is invalid, return View(model).
+    private readonly PolicyService _policyService = new PolicyService();
 
-    await _policyService.CreateAsync(model);
-    return RedirectToAction("Index");
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(PolicyViewModel model)
+    {
+        // TODO 2: If ModelState is invalid, return View(model).
+
+        await _policyService.CreateAsync(model);
+        return RedirectToAction("Index");
+    }
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        RunAsync().GetAwaiter().GetResult();
+    }
+
+    private static async Task RunAsync()
+    {
+        var controller = new PolicyController();
+        controller.ModelState.IsValid = false; // Simulates a blank form.
+
+        IActionResult result =
+            await controller.Create(new PolicyViewModel());
+
+        Console.WriteLine(result.Name); // Expected after fix: View
+    }
+}
+
+// RUNNER SUPPORT
+// These small stand-ins let this MVC exercise run without a complete web
+// project. In a real ASP.NET Core app these types come from the MVC framework.
+public class HttpPostAttribute : Attribute { }
+public class ValidateAntiForgeryTokenAttribute : Attribute { }
+
+public class RequiredAttribute : Attribute
+{
+    public string ErrorMessage { get; set; }
+}
+
+public class IActionResult
+{
+    public string Name { get; set; }
+}
+
+public class ModelStateDictionary
+{
+    public bool IsValid { get; set; }
+}
+
+public class Controller
+{
+    public ModelStateDictionary ModelState { get; } =
+        new ModelStateDictionary { IsValid = true };
+
+    protected IActionResult View(object model)
+    {
+        return new IActionResult { Name = "View" };
+    }
+
+    protected IActionResult RedirectToAction(string action)
+    {
+        return new IActionResult { Name = "Redirect:" + action };
+    }
+}
+
+public class PolicyService
+{
+    public Task CreateAsync(PolicyViewModel model)
+    {
+        return Task.FromResult(0);
+    }
 }`,
       answerKey: `PLAIN-ENGLISH ANSWER
 The HTML "required" attribute helps the user, but it is not security: a request
@@ -373,21 +446,9 @@ Important: INNER JOIN or JOIN are both correct here.`
 // Alice Johnson
 // Carla Gomez
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
-
-var employees = new List<Employee>
-{
-    new Employee { Id = 1, Name = "Carla Gomez", Department = "Claims", IsActive = true },
-    new Employee { Id = 2, Name = "Bob Smith", Department = "Sales", IsActive = false },
-    new Employee { Id = 3, Name = "Alice Johnson", Department = "Claims", IsActive = true }
-};
-
-var names = employees
-    // Filter IsActive == true
-    // Sort by Name
-    // Select Name
-    .ToList();
 
 public class Employee
 {
@@ -395,6 +456,30 @@ public class Employee
     public string Name { get; set; } = "";
     public string Department { get; set; } = "";
     public bool IsActive { get; set; }
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        var employees = new List<Employee>
+        {
+            new Employee { Id = 1, Name = "Carla Gomez", Department = "Claims", IsActive = true },
+            new Employee { Id = 2, Name = "Bob Smith", Department = "Sales", IsActive = false },
+            new Employee { Id = 3, Name = "Alice Johnson", Department = "Claims", IsActive = true }
+        };
+
+        var names = employees
+            // Filter IsActive == true
+            // Sort by Name
+            // Select Name
+            .ToList();
+
+        foreach (var name in names)
+        {
+            Console.WriteLine(name);
+        }
+    }
 }`,
       answerKey: `PLAIN-ENGLISH ANSWER
 Filter the list to active employees, sort those employees by name, and then
@@ -447,7 +532,23 @@ public class Policy
 
 // TODO 2: Write the two EF Core commands as comments:
 // Create migration:
-// Apply migration:`,
+// Apply migration:
+
+public class Program
+{
+    public static void Main()
+    {
+        var policy = new Policy
+        {
+            Id = 101,
+            PolicyNumber = "AUTO-1001",
+            CustomerName = "Alice Johnson",
+            Premium = 125.50m
+        };
+
+        Console.WriteLine(policy.PolicyNumber); // Expected: AUTO-1001
+    }
+}`,
       answerKey: `PLAIN-ENGLISH ANSWER
 Entity Framework maps the Policy class to a database table. Changing the C#
 class alone does not update the existing SQL Server table. A migration records
@@ -503,6 +604,39 @@ Accept either the dotnet CLI or Package Manager Console command style.`
 //
 // Which SOLID letter does this change demonstrate most directly?
 
+using System;
+
+public class Policy
+{
+    public string CustomerEmail { get; set; } = "";
+}
+
+public interface IPolicyRepository
+{
+    void Save(Policy policy);
+}
+
+public interface IEmailService
+{
+    void SendConfirmation(string email);
+}
+
+public class PolicyRepository : IPolicyRepository
+{
+    public void Save(Policy policy)
+    {
+        Console.WriteLine("Policy saved");
+    }
+}
+
+public class EmailSender : IEmailService
+{
+    public void SendConfirmation(string email)
+    {
+        Console.WriteLine("Email sent to " + email);
+    }
+}
+
 public class PolicyService
 {
     private readonly IPolicyRepository _policies;
@@ -517,6 +651,22 @@ public class PolicyService
     {
         _policies.Save(policy);
         _email.SendConfirmation(policy.CustomerEmail);
+    }
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        var service = new PolicyService(
+            new PolicyRepository()
+            // After injecting IEmailService, pass new EmailSender() here.
+        );
+
+        service.CreatePolicy(new Policy
+        {
+            CustomerEmail = "alice@example.com"
+        });
     }
 }
 
@@ -568,6 +718,16 @@ public class PolicyService
 }
 
 // SOLID letter: D — Dependency Inversion
+
+The supplied Program must also pass the new dependency:
+
+var service = new PolicyService(
+    new PolicyRepository(),
+    new EmailSender());
+
+Press Run and expect:
+Policy saved
+Email sent to alice@example.com
 
 WHY THIS HELPS
 A production application can inject a real email service. A unit test can inject
@@ -626,6 +786,36 @@ injection without remembering the words "Dependency Inversion."`
 //
 // Choose sensible C# types and create both classes below.
 
+using System;
+
+// Add your Customer and Policy classes here.
+
+// This code runs after you create both classes. Do not change it.
+public class Program
+{
+    public static void Main()
+    {
+        var customer = new Customer
+        {
+            Id = 1,
+            Name = "Alice Johnson",
+            Email = "alice@example.com"
+        };
+
+        var policy = new Policy
+        {
+            Id = 101,
+            PolicyNumber = "AUTO-1001",
+            Status = "Active",
+            Premium = 125.50,
+            Customer = customer
+        };
+
+        Console.WriteLine(policy.PolicyNumber);       // Expected: AUTO-1001
+        Console.WriteLine(policy.Customer.Name);      // Expected: Alice Johnson
+        Console.WriteLine(policy.Premium);            // Expected: 125.5
+    }
+}
 `,
       answerKey: `PLAIN-ENGLISH ANSWER
 The customer and policy are different concepts, so each gets its own class.
@@ -646,14 +836,19 @@ public class Policy
     public int Id { get; set; }
     public string PolicyNumber { get; set; } = "";
     public string Status { get; set; } = "";
-    public decimal Premium { get; set; }
+    public double Premium { get; set; }
     public Customer Customer { get; set; } = new Customer();
 }
+
+Keep the supplied Program class below these two classes. Press Run and expect:
+AUTO-1001
+Alice Johnson
+125.5
 
 WHY THESE TYPES?
 - int is reasonable for the sample IDs.
 - string fits names, email addresses, policy numbers, and the simple status.
-- decimal is normally preferred over double for money.
+- double keeps this short exercise consistent with the warm-up.
 - Customer connects the two objects and keeps customer details together.
 
 HOW TO GRADE (0-3)

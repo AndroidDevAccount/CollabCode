@@ -24,6 +24,7 @@ async function executeCSharp(code, stdin) {
       signal: controller.signal,
       body: JSON.stringify({
         compiler: 'mono-6.12.0.199',
+        'compiler-option-raw': '-r:System.Net.Http.dll',
         code,
         stdin: stdin || ''
       })
