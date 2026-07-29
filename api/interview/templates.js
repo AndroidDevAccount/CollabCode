@@ -24,9 +24,9 @@ const templateOrder = [
   'ef-migration',
   'aspnet-mvc',
   'csharp-rest-api',
-  'solid-refactor',
   'ai-prompting',
-  'frontend-css'
+  'frontend-css',
+  'csharp-claim-limit'
 ];
 
 const templates = Object.fromEntries(

@@ -588,69 +588,43 @@ DO NOT PENALIZE
 Accept either the dotnet CLI or Package Manager Console command style.`
     },
 
-    'solid-refactor': {
-      title: 'SOLID Dependency Injection',
+    'csharp-claim-limit': {
+      title: 'C# OOP — Approved Claims and Coverage Limit',
       language: 'csharp',
-      content: `// 5-minute SOLID question
+      content: `// C# object-oriented coding question
 //
-// The repository is already passed into the constructor as an interface.
-// The email sender is still created directly inside PolicyService.
+// A Policy contains Claim objects and has a maximum CoverageLimit.
 //
-// Refactor PolicyService so IEmailService is also constructor-injected:
-// 1. Change the _email field to IEmailService.
-// 2. Add IEmailService email to the constructor.
-// 3. Assign it to _email.
-// 4. Do not create EmailSender directly.
+// Complete CalculatePayableClaimTotal:
+// 1. Ignore claims that are not approved.
+// 2. Ignore claim amounts that are zero or negative.
+// 3. Add the remaining claim amounts.
+// 4. Never return more than the policy's CoverageLimit.
 //
-// Which SOLID letter does this change demonstrate most directly?
+// Example:
+// Approved 400 + approved 800 = 1200.
+// The coverage limit is 1000, so the method returns 1000.
 
 using System;
 
+public class Claim
+{
+    public double Amount { get; set; }
+    public bool IsApproved { get; set; }
+}
+
 public class Policy
 {
-    public string CustomerEmail { get; set; } = "";
-}
+    public double CoverageLimit { get; set; }
+    public Claim[] Claims { get; set; }
 
-public interface IPolicyRepository
-{
-    void Save(Policy policy);
-}
-
-public interface IEmailService
-{
-    void SendConfirmation(string email);
-}
-
-public class PolicyRepository : IPolicyRepository
-{
-    public void Save(Policy policy)
+    public double CalculatePayableClaimTotal()
     {
-        Console.WriteLine("Policy saved");
-    }
-}
+        double total = 0;
 
-public class EmailSender : IEmailService
-{
-    public void SendConfirmation(string email)
-    {
-        Console.WriteLine("Email sent to " + email);
-    }
-}
+        // Write your loop, filters, and coverage-limit check here.
 
-public class PolicyService
-{
-    private readonly IPolicyRepository _policies;
-    private readonly EmailSender _email = new EmailSender();
-
-    public PolicyService(IPolicyRepository policies)
-    {
-        _policies = policies;
-    }
-
-    public void CreatePolicy(Policy policy)
-    {
-        _policies.Save(policy);
-        _email.SendConfirmation(policy.CustomerEmail);
+        return total;
     }
 }
 
@@ -658,99 +632,70 @@ public class Program
 {
     public static void Main()
     {
-        var service = new PolicyService(
-            new PolicyRepository()
-            // After injecting IEmailService, pass new EmailSender() here.
-        );
-
-        service.CreatePolicy(new Policy
+        var policy = new Policy
         {
-            CustomerEmail = "alice@example.com"
-        });
+            CoverageLimit = 1000,
+            Claims = new Claim[]
+            {
+                new Claim { Amount = 400, IsApproved = true },
+                new Claim { Amount = 300, IsApproved = false },
+                new Claim { Amount = 800, IsApproved = true },
+                new Claim { Amount = -50, IsApproved = true }
+            }
+        };
+
+        Console.WriteLine(
+            policy.CalculatePayableClaimTotal()); // Expected: 1000
     }
-}
-
-// SOLID letter:`,
-      answerKey: `WHAT IS SOLID?
-SOLID is a set of five guidelines for organizing object-oriented code so it is
-easier to change, test, and maintain:
-
-S — Single Responsibility:
-    A class should have one main job or one reason to change.
-O — Open/Closed:
-    Add new behavior without repeatedly rewriting stable existing code.
-L — Liskov Substitution:
-    A replacement implementation should work wherever its interface is expected.
-I — Interface Segregation:
-    Prefer small, focused interfaces over one large interface with unrelated jobs.
-D — Dependency Inversion:
-    Business code should depend on interfaces, not directly on database or email
-    implementations.
-
-Do not expect the candidate to recite all five definitions. This exercise mainly
-tests the D: Dependency Inversion Principle and basic constructor injection.
-
-WHAT IS WRONG WITH THIS CLASS?
-The repository already follows Dependency Inversion: PolicyService depends on
-IPolicyRepository rather than constructing a SQL repository. Email does not:
-new EmailSender() permanently couples the class to that implementation. It is
-harder to replace the email provider and harder to test without sending email.
+}`,
+      answerKey: `PLAIN-ENGLISH ANSWER
+Loop through the Claim objects. Add an amount only when the claim is approved
+and its amount is positive. After adding the valid claims, return the smaller
+of that total and CoverageLimit.
 
 ONE GOOD SOLUTION
-public class PolicyService
+public double CalculatePayableClaimTotal()
 {
-    private readonly IPolicyRepository _policies;
-    private readonly IEmailService _email;
+    double total = 0;
 
-    public PolicyService(
-        IPolicyRepository policies,
-        IEmailService email)
+    foreach (Claim claim in Claims)
     {
-        _policies = policies;
-        _email = email;
+        if (claim.IsApproved && claim.Amount > 0)
+        {
+            total += claim.Amount;
+        }
     }
 
-    public void CreatePolicy(Policy policy)
+    if (total > CoverageLimit)
     {
-        _policies.Save(policy);
-        _email.SendConfirmation(policy.CustomerEmail);
+        return CoverageLimit;
     }
+
+    return total;
 }
 
-// SOLID letter: D — Dependency Inversion
+ALSO CORRECT
+return Math.Min(total, CoverageLimit);
 
-The supplied Program must also pass the new dependency:
+EXPECTED OUTPUT
+1000
 
-var service = new PolicyService(
-    new PolicyRepository(),
-    new EmailSender());
+HOW TO GRADE (0-4)
+4 — Iterates over Claim objects, applies both filters, sums the valid amounts,
+    enforces the coverage limit, and gets 1000.
+3 — Correct overall design with one small syntax or boundary mistake.
+2 — Correctly filters and totals the claims but forgets the coverage limit, or
+    enforces the limit but misses one filter.
+1 — Can iterate through Claims but needs substantial help with the rules.
+0 — Cannot work with the Claim objects or produce a meaningful total.
 
-Press Run and expect:
-Policy saved
-Email sent to alice@example.com
+USEFUL TESTS TO DISCUSS
+- Valid total below the limit returns the total.
+- Valid total above the limit returns the limit.
+- Rejected, zero, and negative claims add nothing.
+- An empty array returns zero.
 
-WHY THIS HELPS
-A production application can inject a real email service. A unit test can inject
-a fake email service that records the call without sending anything.
-
-SINGLE RESPONSIBILITY CONNECTION
-IPolicyRepository owns persistence and IEmailService owns email delivery.
-PolicyService can reasonably coordinate the single "create a policy" workflow.
-The clearest problem shown by new EmailSender() is the concrete dependency, so
-Dependency Inversion is the primary answer.
-
-HOW TO GRADE (0–3)
-3 — Injects IEmailService through the constructor, stores it in the field,
-    removes new EmailSender(), and identifies D/Dependency Inversion.
-2 — Correctly performs the constructor refactor but cannot name the principle,
-    or identifies the principle with a small code mistake.
-1 — Says an interface would help testing but cannot wire it into the constructor.
-0 — Leaves new EmailSender() in place or cannot explain the direct dependency.
-
-INTERVIEWER TIP
-IEmailService, INotificationService, or IMailer are all reasonable names. Give
-credit for practical understanding even if the candidate calls this dependency
-injection without remembering the words "Dependency Inversion."`
+Do not require LINQ. A clear foreach solution is ideal for this exercise.`
     },
 
     'csharp-debugging': {
@@ -868,7 +813,7 @@ ACCEPTABLE VARIATIONS
 - Constructors are optional. Auto-properties are enough for full credit.
 
 HOW THIS CONNECTS TO LATER QUESTIONS
-The later SQL, MVC, Entity Framework, LINQ, and SOLID exercises build on these
+The later SQL, MVC, Entity Framework, LINQ, and claims exercises build on these
 same Customer and Policy ideas. The candidate does not need every production
 field yet; this is only the starting model.`
     },
@@ -983,19 +928,7 @@ Bonus: In that same @media rule, make the button fill the card width.
 -->
 
 <style>
-    /* Existing CSS — edit this */
-    .policy-card {
-        padding: 0;
-        border: none;
-    }
-
-    .details-button {
-        width: auto;
-    }
-
-    /* Add the heading and paragraph styles here */
-
-    /* Add the mobile rule here */
+    /* Write all of your CSS here. */
 </style>
 
 <!-- Existing HTML — do not change -->
@@ -1086,9 +1019,9 @@ whether you have memorized every piece of syntax.
 5. Entity Framework — Add a Field and Migration
 6. ASP.NET MVC — Validation
 7. C# — REST API Basics
-8. SOLID — Constructor Injection
-9. AI — Prompt a Coding Assistant
-10. HTML/CSS — Responsive Policy Card
+8. AI — Prompt a Coding Assistant
+9. HTML/CSS — Responsive Policy Card
+10. C# — Approved Claims and Coverage Limit
 
 ## How to approach each exercise
 
