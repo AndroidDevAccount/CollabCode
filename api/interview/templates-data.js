@@ -623,21 +623,103 @@ public class Policy
 
 public class Program
 {
+    private static int testsPassed = 0;
+    private static int testsRun = 0;
+
     public static void Main()
     {
-        var policy = new Policy
-        {
-            ClaimIds = new int[] { 100, 100, 205, 205, 310 }
-        };
+        RunTest(
+            "Mixed duplicates",
+            new int[] { 100, 100, 205, 205, 310 },
+            new int[] { 100, 205, 310 });
+
+        RunTest(
+            "Empty array",
+            new int[0],
+            new int[0]);
+
+        RunTest(
+            "One claim ID",
+            new int[] { 700 },
+            new int[] { 700 });
+
+        RunTest(
+            "All duplicates",
+            new int[] { 42, 42, 42, 42 },
+            new int[] { 42 });
+
+        RunTest(
+            "Already unique",
+            new int[] { 10, 20, 30, 40 },
+            new int[] { 10, 20, 30, 40 });
+
+        Console.WriteLine("SUMMARY: " + testsPassed + "/" + testsRun + " tests passed");
+    }
+
+    private static void RunTest(
+        string name,
+        int[] input,
+        int[] expectedIds)
+    {
+        testsRun++;
+        string originalInput = FormatIds(input, input.Length);
+        var policy = new Policy { ClaimIds = input };
 
         int uniqueCount = policy.RemoveDuplicateClaimIds();
+        bool passed =
+            uniqueCount == expectedIds.Length &&
+            FirstIdsMatch(policy.ClaimIds, expectedIds);
 
-        Console.WriteLine(uniqueCount); // Expected: 3
-        for (int i = 0; i < uniqueCount; i++)
+        if (passed)
         {
-            Console.WriteLine(policy.ClaimIds[i]);
+            testsPassed++;
         }
-        // Expected IDs: 100, 205, 310
+
+        Console.WriteLine("TEST: " + name);
+        Console.WriteLine("  Input:          " + originalInput);
+        Console.WriteLine("  Expected count: " + expectedIds.Length);
+        Console.WriteLine("  Actual count:   " + uniqueCount);
+        Console.WriteLine("  Expected IDs:   " +
+            FormatIds(expectedIds, expectedIds.Length));
+        Console.WriteLine("  Actual IDs:     " +
+            FormatIds(policy.ClaimIds, uniqueCount));
+        Console.WriteLine("  RESULT: " + (passed ? "PASS" : "FAIL"));
+        Console.WriteLine();
+    }
+
+    private static bool FirstIdsMatch(int[] actual, int[] expected)
+    {
+        if (actual == null || actual.Length < expected.Length)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < expected.Length; i++)
+        {
+            if (actual[i] != expected[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static string FormatIds(int[] values, int count)
+    {
+        if (values == null)
+        {
+            return "(null)";
+        }
+
+        count = Math.Max(0, Math.Min(count, values.Length));
+        string text = "[";
+        for (int i = 0; i < count; i++)
+        {
+            if (i > 0) text += ", ";
+            text += values[i];
+        }
+        return text + "]";
     }
 }`,
       answerKey: `PLAIN-ENGLISH ANSWER
@@ -667,11 +749,11 @@ public int RemoveDuplicateClaimIds()
     return uniqueIndex + 1;
 }
 
-EXPECTED OUTPUT
-3
-100
-205
-310
+EXPECTED RESULT
+The runner prints the input, expected count and IDs, actual count and IDs, and
+PASS or FAIL for each case. A correct solution ends with:
+
+SUMMARY: 5/5 tests passed
 
 HOW TO GRADE (0-4)
 4 — Compacts unique IDs in place, preserves order, returns 3, and handles an
