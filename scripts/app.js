@@ -3,6 +3,20 @@
   let appInitialized = false;
   let adminDashboardInitialized = false;
 
+  // Ended/invalid candidate sessions must clear both the saved candidate login
+  // and the URL hash before reloading. Otherwise the load handler sees the same
+  // authenticated candidate + session code and retries forever.
+  window.returnToHomeAfterSessionEnd = function() {
+    if (window.Auth) {
+      Auth.logout();
+    } else {
+      sessionStorage.removeItem('candidate_session');
+    }
+
+    const homeUrl = window.location.pathname + window.location.search;
+    window.location.replace(homeUrl);
+  };
+
   // Initialize the application
   function init() {
     if (appInitialized) return;
@@ -1816,7 +1830,7 @@
           init();
         } else {
           alert(validation.error || 'Invalid session');
-          location.reload();
+          window.returnToHomeAfterSessionEnd();
         }
         return;
       }

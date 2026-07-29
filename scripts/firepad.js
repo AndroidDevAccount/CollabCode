@@ -26,7 +26,7 @@
           <p style="color: #333; font-size: 16px; margin-bottom: 10px;">This interview has been terminated by the interviewer.</p>
           <p style="color: #555; font-size: 15px;">Thank you for your participation!</p>
         </div>
-        <button onclick="location.reload()" class="primary-btn" style="background: #fff; color: #667eea; font-weight: bold; font-size: 16px; padding: 12px 30px; border: 2px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">Return to Home</button>
+        <button onclick="window.returnToHomeAfterSessionEnd()" class="primary-btn" style="background: #fff; color: #667eea; font-weight: bold; font-size: 16px; padding: 12px 30px; border: 2px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">Return to Home</button>
       </div>
     </div>
   `;
