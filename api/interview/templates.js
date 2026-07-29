@@ -26,7 +26,7 @@ const templateOrder = [
   'csharp-rest-api',
   'ai-prompting',
   'frontend-css',
-  'csharp-claim-limit'
+  'csharp-unique-claims'
 ];
 
 const templates = Object.fromEntries(

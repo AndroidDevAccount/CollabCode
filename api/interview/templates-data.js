@@ -588,43 +588,36 @@ DO NOT PENALIZE
 Accept either the dotnet CLI or Package Manager Console command style.`
     },
 
-    'csharp-claim-limit': {
-      title: 'C# OOP — Approved Claims and Coverage Limit',
+    'csharp-unique-claims': {
+      title: 'C# OOP — Remove Duplicate Claim IDs',
       language: 'csharp',
       content: `// C# object-oriented coding question
 //
-// A Policy contains Claim objects and has a maximum CoverageLimit.
+// An import gave this Policy a sorted array of claim IDs. Some IDs appear
+// more than once.
 //
-// Complete CalculatePayableClaimTotal:
-// 1. Ignore claims that are not approved.
-// 2. Ignore claim amounts that are zero or negative.
-// 3. Add the remaining claim amounts.
-// 4. Never return more than the policy's CoverageLimit.
+// Complete RemoveDuplicateClaimIds:
+// 1. Modify ClaimIds in place so each ID appears once at the beginning.
+// 2. Keep the unique IDs in their original sorted order.
+// 3. Return the number of unique IDs.
+// 4. Do not create another array or List.
 //
 // Example:
-// Approved 400 + approved 800 = 1200.
-// The coverage limit is 1000, so the method returns 1000.
+// ClaimIds starts as: { 100, 100, 205, 205, 310 }
+// Return: 3
+// The first 3 positions become: { 100, 205, 310 }
+// Anything after those first 3 positions can be ignored.
 
 using System;
 
-public class Claim
-{
-    public double Amount { get; set; }
-    public bool IsApproved { get; set; }
-}
-
 public class Policy
 {
-    public double CoverageLimit { get; set; }
-    public Claim[] Claims { get; set; }
+    public int[] ClaimIds { get; set; }
 
-    public double CalculatePayableClaimTotal()
+    public int RemoveDuplicateClaimIds()
     {
-        double total = 0;
-
-        // Write your loop, filters, and coverage-limit check here.
-
-        return total;
+        // Write your code here.
+        return 0;
     }
 }
 
@@ -634,68 +627,73 @@ public class Program
     {
         var policy = new Policy
         {
-            CoverageLimit = 1000,
-            Claims = new Claim[]
-            {
-                new Claim { Amount = 400, IsApproved = true },
-                new Claim { Amount = 300, IsApproved = false },
-                new Claim { Amount = 800, IsApproved = true },
-                new Claim { Amount = -50, IsApproved = true }
-            }
+            ClaimIds = new int[] { 100, 100, 205, 205, 310 }
         };
 
-        Console.WriteLine(
-            policy.CalculatePayableClaimTotal()); // Expected: 1000
+        int uniqueCount = policy.RemoveDuplicateClaimIds();
+
+        Console.WriteLine(uniqueCount); // Expected: 3
+        for (int i = 0; i < uniqueCount; i++)
+        {
+            Console.WriteLine(policy.ClaimIds[i]);
+        }
+        // Expected IDs: 100, 205, 310
     }
 }`,
       answerKey: `PLAIN-ENGLISH ANSWER
-Loop through the Claim objects. Add an amount only when the claim is approved
-and its amount is positive. After adding the valid claims, return the smaller
-of that total and CoverageLimit.
+Because ClaimIds is sorted, duplicates are next to each other. Keep one index
+for the last unique ID already stored and scan the remaining IDs with another
+index. When the scanned ID is different, move it into the next unique position.
 
 ONE GOOD SOLUTION
-public double CalculatePayableClaimTotal()
+public int RemoveDuplicateClaimIds()
 {
-    double total = 0;
-
-    foreach (Claim claim in Claims)
+    if (ClaimIds.Length == 0)
     {
-        if (claim.IsApproved && claim.Amount > 0)
+        return 0;
+    }
+
+    int uniqueIndex = 0;
+
+    for (int scanIndex = 1; scanIndex < ClaimIds.Length; scanIndex++)
+    {
+        if (ClaimIds[scanIndex] != ClaimIds[uniqueIndex])
         {
-            total += claim.Amount;
+            uniqueIndex++;
+            ClaimIds[uniqueIndex] = ClaimIds[scanIndex];
         }
     }
 
-    if (total > CoverageLimit)
-    {
-        return CoverageLimit;
-    }
-
-    return total;
+    return uniqueIndex + 1;
 }
 
-ALSO CORRECT
-return Math.Min(total, CoverageLimit);
-
 EXPECTED OUTPUT
-1000
+3
+100
+205
+310
 
 HOW TO GRADE (0-4)
-4 — Iterates over Claim objects, applies both filters, sums the valid amounts,
-    enforces the coverage limit, and gets 1000.
-3 — Correct overall design with one small syntax or boundary mistake.
-2 — Correctly filters and totals the claims but forgets the coverage limit, or
-    enforces the limit but misses one filter.
-1 — Can iterate through Claims but needs substantial help with the rules.
-0 — Cannot work with the Claim objects or produce a meaningful total.
+4 — Compacts unique IDs in place, preserves order, returns 3, and handles an
+    empty array.
+3 — Correct two-index approach with one small boundary or return-value mistake.
+2 — Finds the unique IDs but creates another collection, or needs a hint to
+    overwrite positions in ClaimIds.
+1 — Can identify duplicates but cannot produce the required in-place result.
+0 — Cannot explain or implement a way to remove adjacent duplicates.
 
 USEFUL TESTS TO DISCUSS
-- Valid total below the limit returns the total.
-- Valid total above the limit returns the limit.
-- Rejected, zero, and negative claims add nothing.
-- An empty array returns zero.
+- An empty array returns 0.
+- One ID returns 1.
+- All duplicate IDs return 1.
+- An already-unique array returns its original length.
 
-Do not require LINQ. A clear foreach solution is ideal for this exercise.`
+WHY TWO INDEXES?
+scanIndex examines every value. uniqueIndex marks the end of the compacted,
+unique portion of the same array. This uses constant extra space and changes the
+existing ClaimIds array rather than allocating a replacement.
+
+Do not require the exact variable names shown above.`
     },
 
     'csharp-debugging': {
@@ -1021,7 +1019,7 @@ whether you have memorized every piece of syntax.
 7. C# — REST API Basics
 8. AI — Prompt a Coding Assistant
 9. HTML/CSS — Responsive Policy Card
-10. C# — Approved Claims and Coverage Limit
+10. C# — Remove Duplicate Claim IDs
 
 ## How to approach each exercise
 
