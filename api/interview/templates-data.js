@@ -589,35 +589,40 @@ Accept either the dotnet CLI or Package Manager Console command style.`
     },
 
     'csharp-unique-claims': {
-      title: 'C# OOP — Remove Duplicate Claim IDs',
+      title: 'C# OOP — Remove Duplicate Claims',
       language: 'csharp',
       content: `// C# object-oriented coding question
 //
-// An import gave this Policy a sorted array of claim IDs. Some IDs appear
-// more than once.
+// An import added duplicate Claim objects to a Policy. The Claims list is
+// already sorted by Id, so duplicate IDs are next to each other.
 //
-// Complete RemoveDuplicateClaimIds:
-// 1. Modify ClaimIds in place so each ID appears once at the beginning.
-// 2. Keep the unique IDs in their original sorted order.
-// 3. Return the number of unique IDs.
-// 4. Do not create another array or List.
+// Complete RemoveDuplicateClaims:
+// 1. Remove duplicate claims from the existing Claims list.
+// 2. Keep the first Claim for each Id.
+// 3. Preserve the original order.
+// 4. Return the number of claims remaining.
 //
 // Example:
-// ClaimIds starts as: { 100, 100, 205, 205, 310 }
+// Claim IDs before: { 100, 100, 205, 205, 310 }
+// Claim IDs after:  { 100, 205, 310 }
 // Return: 3
-// The first 3 positions become: { 100, 205, 310 }
-// Anything after those first 3 positions can be ignored.
 
 using System;
+using System.Collections.Generic;
+
+public class Claim
+{
+    public int Id { get; set; }
+}
 
 public class Policy
 {
-    public int[] ClaimIds { get; set; }
+    public List<Claim> Claims { get; set; } = new List<Claim>();
 
-    public int RemoveDuplicateClaimIds()
+    public int RemoveDuplicateClaims()
     {
         // Write your code here.
-        return 0;
+        return Claims.Count;
     }
 }
 
@@ -628,28 +633,15 @@ public class Program
 
     public static void Main()
     {
-        RunTest(
-            "Mixed duplicates",
+        RunTest("Mixed duplicates",
             new int[] { 100, 100, 205, 205, 310 },
             new int[] { 100, 205, 310 });
-
-        RunTest(
-            "Empty array",
-            new int[0],
-            new int[0]);
-
-        RunTest(
-            "One claim ID",
-            new int[] { 700 },
-            new int[] { 700 });
-
-        RunTest(
-            "All duplicates",
+        RunTest("Empty list", new int[0], new int[0]);
+        RunTest("One claim", new int[] { 700 }, new int[] { 700 });
+        RunTest("All duplicates",
             new int[] { 42, 42, 42, 42 },
             new int[] { 42 });
-
-        RunTest(
-            "Already unique",
+        RunTest("Already unique",
             new int[] { 10, 20, 30, 40 },
             new int[] { 10, 20, 30, 40 });
 
@@ -658,124 +650,97 @@ public class Program
 
     private static void RunTest(
         string name,
-        int[] input,
+        int[] inputIds,
         int[] expectedIds)
     {
         testsRun++;
-        string originalInput = FormatIds(input, input.Length);
-        var policy = new Policy { ClaimIds = input };
-
-        int uniqueCount = policy.RemoveDuplicateClaimIds();
-        bool passed =
-            uniqueCount == expectedIds.Length &&
-            FirstIdsMatch(policy.ClaimIds, expectedIds);
-
-        if (passed)
+        var policy = new Policy();
+        foreach (int id in inputIds)
         {
-            testsPassed++;
+            policy.Claims.Add(new Claim { Id = id });
         }
 
+        int remainingCount = policy.RemoveDuplicateClaims();
+        bool passed =
+            remainingCount == expectedIds.Length &&
+            policy.Claims.Count == expectedIds.Length &&
+            IdsMatch(policy.Claims, expectedIds);
+
+        if (passed) testsPassed++;
+
         Console.WriteLine("TEST: " + name);
-        Console.WriteLine("  Input:          " + originalInput);
-        Console.WriteLine("  Expected count: " + expectedIds.Length);
-        Console.WriteLine("  Actual count:   " + uniqueCount);
-        Console.WriteLine("  Expected IDs:   " +
-            FormatIds(expectedIds, expectedIds.Length));
-        Console.WriteLine("  Actual IDs:     " +
-            FormatIds(policy.ClaimIds, uniqueCount));
+        Console.WriteLine("  Input IDs:      " + FormatIds(inputIds));
+        Console.WriteLine("  Expected IDs:   " + FormatIds(expectedIds));
+        Console.WriteLine("  Actual IDs:     " + FormatClaims(policy.Claims));
+        Console.WriteLine("  Returned count: " + remainingCount);
+        Console.WriteLine("  List.Count:     " + policy.Claims.Count);
         Console.WriteLine("  RESULT: " + (passed ? "PASS" : "FAIL"));
         Console.WriteLine();
     }
 
-    private static bool FirstIdsMatch(int[] actual, int[] expected)
+    private static bool IdsMatch(List<Claim> actual, int[] expected)
     {
-        if (actual == null || actual.Length < expected.Length)
-        {
-            return false;
-        }
-
+        if (actual.Count != expected.Length) return false;
         for (int i = 0; i < expected.Length; i++)
         {
-            if (actual[i] != expected[i])
-            {
-                return false;
-            }
+            if (actual[i].Id != expected[i]) return false;
         }
-
         return true;
     }
 
-    private static string FormatIds(int[] values, int count)
+    private static string FormatClaims(List<Claim> claims)
     {
-        if (values == null)
-        {
-            return "(null)";
-        }
+        int[] ids = new int[claims.Count];
+        for (int i = 0; i < claims.Count; i++) ids[i] = claims[i].Id;
+        return FormatIds(ids);
+    }
 
-        count = Math.Max(0, Math.Min(count, values.Length));
-        string text = "[";
-        for (int i = 0; i < count; i++)
-        {
-            if (i > 0) text += ", ";
-            text += values[i];
-        }
-        return text + "]";
+    private static string FormatIds(int[] ids)
+    {
+        return "[" + string.Join(", ", ids) + "]";
     }
 }`,
       answerKey: `PLAIN-ENGLISH ANSWER
-Because ClaimIds is sorted, duplicates are next to each other. Keep one index
-for the last unique ID already stored and scan the remaining IDs with another
-index. When the scanned ID is different, move it into the next unique position.
+Because the list is sorted, duplicate IDs are next to each other. Walk backward
+through the list. When a claim has the same Id as the claim before it, remove
+the later claim. Walking backward prevents a removal from causing the loop to
+skip the next item.
 
 ONE GOOD SOLUTION
-public int RemoveDuplicateClaimIds()
+public int RemoveDuplicateClaims()
 {
-    if (ClaimIds.Length == 0)
+    for (int i = Claims.Count - 1; i > 0; i--)
     {
-        return 0;
-    }
-
-    int uniqueIndex = 0;
-
-    for (int scanIndex = 1; scanIndex < ClaimIds.Length; scanIndex++)
-    {
-        if (ClaimIds[scanIndex] != ClaimIds[uniqueIndex])
+        if (Claims[i].Id == Claims[i - 1].Id)
         {
-            uniqueIndex++;
-            ClaimIds[uniqueIndex] = ClaimIds[scanIndex];
+            Claims.RemoveAt(i);
         }
     }
 
-    return uniqueIndex + 1;
+    return Claims.Count;
 }
 
 EXPECTED RESULT
-The runner prints the input, expected count and IDs, actual count and IDs, and
-PASS or FAIL for each case. A correct solution ends with:
+The runner displays the IDs before and after, the returned count, the real
+List.Count, and PASS or FAIL. A correct solution ends with:
 
 SUMMARY: 5/5 tests passed
 
 HOW TO GRADE (0-4)
-4 — Compacts unique IDs in place, preserves order, returns 3, and handles an
-    empty array.
-3 — Correct two-index approach with one small boundary or return-value mistake.
-2 — Finds the unique IDs but creates another collection, or needs a hint to
-    overwrite positions in ClaimIds.
-1 — Can identify duplicates but cannot produce the required in-place result.
-0 — Cannot explain or implement a way to remove adjacent duplicates.
+4 — Removes duplicates from the existing list, keeps the first Claim, preserves
+    order, returns the new Count, and passes all five cases.
+3 — Correct approach with one small index or boundary mistake.
+2 — Produces the right IDs by replacing the list with a new collection, or
+    needs a hint to avoid skipping items after RemoveAt.
+1 — Can find adjacent duplicates but cannot remove them safely.
+0 — Cannot identify or remove duplicate Claim objects.
 
-USEFUL TESTS TO DISCUSS
-- An empty array returns 0.
-- One ID returns 1.
-- All duplicate IDs return 1.
-- An already-unique array returns its original length.
+WHY LOOP BACKWARD?
+RemoveAt shifts every later item one position to the left. A forward loop can
+skip an item unless its index is adjusted. A backward loop only removes items
+that the loop has already passed, so its remaining indexes stay valid.
 
-WHY TWO INDEXES?
-scanIndex examines every value. uniqueIndex marks the end of the compacted,
-unique portion of the same array. This uses constant extra space and changes the
-existing ClaimIds array rather than allocating a replacement.
-
-Do not require the exact variable names shown above.`
+Accept a careful forward loop or another clear in-place List solution.`
     },
 
     'csharp-debugging': {
