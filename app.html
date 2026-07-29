@@ -22,7 +22,7 @@
 
     <!-- styling -->
     <!-- Custom style -->
-    <link rel="stylesheet" href="styles/main.css?v=14">
+    <link rel="stylesheet" href="styles/main.css?v=15">
     <!-- Firepad -->
     <link rel="stylesheet" href="https://cdn.firebase.com/libs/firepad/1.4.0/firepad.css" />
 
@@ -608,10 +608,7 @@
         </div>
 
         <div class="center-info">
-          <img src="/images/favicon/apple-touch-icon-57x57.png" alt="Atom Tickets" width="24" height="24" style="margin-right: 8px; vertical-align: middle;">
           <span id="session-info"></span>
-          <button id="dashboard-btn" type="button" class="dashboard-session-button" style="display: none;">Dashboard</button>
-          <button id="end-session-btn" class="end-session-button">End Interview</button>
           <div class="connected-users-control">
             <button id="user-count" class="user-count" type="button" aria-haspopup="true" aria-expanded="false"></button>
             <div id="users-list" class="connected-users-menu" hidden></div>
@@ -622,7 +619,17 @@
           <button id="notes-toggle-btn" class="notes-button" style="display: none;">📝 Notes</button>
           <button id="answer-key-btn" type="button" class="notes-button" style="display: none;" disabled>Answer Key</button>
           <button id="run-btn" class="run-button" hidden>▶ Run</button>
-          <button id="share-btn" style="display: none;">Share</button>
+          <details id="admin-menu" class="admin-menu" style="display: none;">
+            <summary aria-label="Open interview menu">
+              <span>Menu</span>
+              <img src="/images/favicon/apple-touch-icon-57x57.png" alt="" width="28" height="28">
+            </summary>
+            <div class="admin-menu-panel">
+              <button id="dashboard-btn" type="button">Dashboard</button>
+              <button id="share-btn" type="button">Share session</button>
+              <button id="end-session-btn" type="button">End Interview</button>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -750,7 +757,7 @@
     <!-- Simple Templates (must load before firepad.js) -->
     <script src="scripts/simple-templates.js?v=2"></script>
     <script src="scripts/custom-dialogs.js?v=2"></script>
-    <script src="scripts/firepad.js?v=23"></script>
+    <script src="scripts/firepad.js?v=24"></script>
     <script src="scripts/interview-notes.js?v=4"></script>
     <script src="scripts/slack-integration.js?v=4"></script>
     <script src="scripts/posthog-tracking.js?v=2"></script>

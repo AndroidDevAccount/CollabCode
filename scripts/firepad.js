@@ -99,31 +99,17 @@
     setupEventListenersOnce();
     
     // Update UI based on role
-    const endSessionBtn = document.getElementById('end-session-btn');
-    const dashboardBtn = document.getElementById('dashboard-btn');
-    const shareBtn = document.getElementById('share-btn');
+    const adminMenu = document.getElementById('admin-menu');
+    const topBar = document.getElementById('top-bar');
     
     if (isAdmin) {
       console.log('Admin user detected - showing End Interview button');
-      const sessionInfo = document.getElementById('session-info');
-      if (sessionInfo && !sessionInfo.innerHTML.includes('Admin')) {
-        sessionInfo.innerHTML += ' <span style="color: #4caf50">(Admin)</span>';
-      }
-      
-      // Admin keeps the button visible (it's visible by default now)
-      if (endSessionBtn) {
-        console.log('End Interview button is visible for admin');
-      }
-      if (dashboardBtn) dashboardBtn.style.display = 'inline-block';
-      if (shareBtn) shareBtn.style.display = 'inline-block';
+      if (topBar) topBar.classList.add('admin-toolbar');
+      if (adminMenu) adminMenu.style.display = 'block';
     } else {
       console.log('Non-admin user - hiding End Interview button');
-      // Hide button for non-admin users
-      if (endSessionBtn) {
-        endSessionBtn.style.display = 'none';
-      }
-      if (dashboardBtn) dashboardBtn.style.display = 'none';
-      if (shareBtn) shareBtn.style.display = 'none';
+      if (topBar) topBar.classList.remove('admin-toolbar');
+      if (adminMenu) adminMenu.style.display = 'none';
     }
   }
 
@@ -951,6 +937,18 @@
     const shareBtn = document.getElementById('share-btn');
     if (shareBtn) {
       shareBtn.addEventListener('click', shareSession);
+    }
+
+    const adminMenu = document.getElementById('admin-menu');
+    if (adminMenu) {
+      adminMenu.querySelectorAll('button').forEach(function(button) {
+        button.addEventListener('click', function() {
+          adminMenu.removeAttribute('open');
+        });
+      });
+      document.addEventListener('click', function(event) {
+        if (!adminMenu.contains(event.target)) adminMenu.removeAttribute('open');
+      });
     }
 
     // Return to the admin dashboard without ending or disconnecting the session.
