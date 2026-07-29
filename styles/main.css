@@ -2957,8 +2957,8 @@ a.powered-by-firepad {
 }
 
 .admin-list-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  display: flex;
+  justify-content: space-between;
   gap: 12px;
   padding: 12px 4px;
   border-bottom: 1px solid #eee;
