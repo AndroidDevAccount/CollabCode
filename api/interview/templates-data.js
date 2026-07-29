@@ -622,7 +622,7 @@ public class Policy
     public int RemoveDuplicateClaims()
     {
         // Write your code here.
-        return Claims.Count;
+        throw new NotImplementedException();
     }
 }
 
@@ -644,6 +644,18 @@ public class Program
         RunTest("Already unique",
             new int[] { 10, 20, 30, 40 },
             new int[] { 10, 20, 30, 40 });
+        RunTest("Large imported list",
+            new int[]
+            {
+                10, 10, 10, 20, 20, 30, 40, 40, 40, 40,
+                50, 50, 60, 70, 70, 80, 80, 80, 90, 100,
+                100, 100, 110, 110, 120, 130, 130, 140, 140, 140
+            },
+            new int[]
+            {
+                10, 20, 30, 40, 50, 60, 70,
+                80, 90, 100, 110, 120, 130, 140
+            });
 
         Console.WriteLine("SUMMARY: " + testsPassed + "/" + testsRun + " tests passed");
     }
@@ -724,11 +736,11 @@ EXPECTED RESULT
 The runner displays the IDs before and after, the returned count, the real
 List.Count, and PASS or FAIL. A correct solution ends with:
 
-SUMMARY: 5/5 tests passed
+SUMMARY: 6/6 tests passed
 
 HOW TO GRADE (0-4)
 4 — Removes duplicates from the existing list, keeps the first Claim, preserves
-    order, returns the new Count, and passes all five cases.
+    order, returns the new Count, and passes all six cases.
 3 — Correct approach with one small index or boundary mistake.
 2 — Produces the right IDs by replacing the list with a new collection, or
     needs a hint to avoid skipping items after RemoveAt.
