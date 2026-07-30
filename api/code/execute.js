@@ -14,7 +14,7 @@ function allowExecutionRequest(req) {
   return true;
 }
 
-async function executeCSharp(code, stdin) {
+async function executeCSharp(code, stdin, attempt = 0) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
   try {
@@ -42,6 +42,31 @@ async function executeCSharp(code, stdin) {
       result.program_error,
       result.program_output
     ].filter(Boolean).join('');
+    const providerMessage = [
+      compilerError,
+      programError,
+      result.compiler_message,
+      result.program_message
+    ].filter(Boolean).join('\n');
+    const providerCapacityFailure =
+      /OCI runtime error|\bcrun\b|Resource temporarily unavailable|failed to create (?:container|process)|cannot allocate memory/i
+        .test(providerMessage);
+
+    if (providerCapacityFailure) {
+      if (attempt < 1) {
+        await new Promise(resolve => setTimeout(resolve, 300));
+        return executeCSharp(code, stdin, attempt + 1);
+      }
+
+      console.error('C# runner capacity failure after retry:', providerMessage);
+      return {
+        success: false,
+        error: 'The C# runner is temporarily out of capacity. Please wait a moment and press Run again.',
+        stage: 'provider',
+        serviceUnavailable: true,
+        code: 503
+      };
+    }
 
     const compilationFailed =
       /Compilation failed|error CS\d+/i.test(compilerError) ||
