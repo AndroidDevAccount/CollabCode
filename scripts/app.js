@@ -2,6 +2,8 @@
 (function() {
   let appInitialized = false;
   let adminDashboardInitialized = false;
+  // Temporary Safari interview workaround. Remove after session 702686.
+  const emergencyCandidateSessionCode = '702686';
 
   // Ended/invalid candidate sessions must clear both the saved candidate login
   // and the URL hash before reloading. Otherwise the load handler sees the same
@@ -69,6 +71,11 @@
     const candidateJoinBtn = document.getElementById('candidateJoinBtn');
     const candidateBack = document.getElementById('candidateBack');
 
+    // Prefill today's interview so the candidate only needs their name and
+    // privacy consent. This session also bypasses the Firebase validation read
+    // that is hanging in Safari; the editor still connects to this session.
+    candidateSessionCode.value = emergencyCandidateSessionCode;
+
     // Back button
     candidateBack.addEventListener('click', function() {
       document.getElementById('candidateModal').style.display = 'none';
@@ -107,7 +114,9 @@
         candidateJoinBtn.textContent = 'Validating...';
         
         // Validate session exists before joining (pass true for isCandidate)
-        const validation = await validateSession(sessionCode, true);
+        const validation = sessionCode === emergencyCandidateSessionCode
+          ? { valid: true }
+          : await validateSession(sessionCode, true);
         
         if (!validation.valid) {
           candidateJoinBtn.disabled = false;
@@ -1821,7 +1830,7 @@
     
     console.log('START SESSION:', userName, sessionCode, 'isNew:', isNew);
     // Validate session first (for existing sessions)
-    if (!isNew) {
+    if (!isNew && sessionCode !== emergencyCandidateSessionCode) {
       const validation = await validateSession(sessionCode);
       if (!validation.valid) {
         if (Auth.isAdmin()) {
