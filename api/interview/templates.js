@@ -26,6 +26,7 @@ const templateOrder = [
   'csharp-rest-api',
   'ai-prompting',
   'frontend-css',
+  'gitlab-yaml',
   'csharp-unique-claims'
 ];
 

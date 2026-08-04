@@ -588,6 +588,89 @@ DO NOT PENALIZE
 Accept either the dotnet CLI or Package Manager Console command style.`
     },
 
+    'gitlab-yaml': {
+      title: 'GitLab CI — Fix and Validate a .NET Pipeline',
+      language: 'yaml',
+      content: `# 5-minute GitLab CI YAML question
+#
+# This pipeline is supposed to build and test a .NET application, but GitLab
+# rejects it because the test job uses a stage that has not been declared.
+# It also runs for every branch, while the team only wants pipelines for:
+# - merge requests
+# - the main branch
+#
+# YOUR TASK
+# 1. Add the missing test stage after build.
+# 2. Keep build_app in the build stage and test_app in the test stage.
+# 3. Add workflow rules so the pipeline runs for merge requests or main.
+# 4. Keep the existing dotnet commands.
+
+image: mcr.microsoft.com/dotnet/sdk:8.0
+
+stages:
+  - build
+
+build_app:
+  stage: build
+  script:
+    - dotnet restore
+    - dotnet build --no-restore
+
+test_app:
+  stage: test
+  script:
+    - dotnet test
+`,
+      answerKey: `WHAT IS WRONG?
+The test_app job says stage: test, but stages declares only build. GitLab's CI
+validator rejects a job whose stage is not in the stages list.
+
+ONE GOOD SOLUTION
+image: mcr.microsoft.com/dotnet/sdk:8.0
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - when: never
+
+stages:
+  - build
+  - test
+
+build_app:
+  stage: build
+  script:
+    - dotnet restore
+    - dotnet build --no-restore
+
+test_app:
+  stage: test
+  script:
+    - dotnet test
+
+HOW TO GRADE (0-4)
+4 — Declares test after build, keeps both jobs in the right stages, and writes
+    valid workflow rules for merge requests and main.
+3 — Corrects the stages and jobs but needs a small hint on one workflow rule.
+2 — Identifies the missing test stage and fixes it, but cannot restrict when the
+    pipeline is created.
+1 — Understands that the stage names must match but produces invalid YAML.
+0 — Cannot identify why GitLab rejects the pipeline.
+
+WHAT TO LISTEN FOR
+- YAML indentation is meaningful; tabs should not be used.
+- stages controls job order: all build jobs finish before test jobs start.
+- workflow: rules controls whether the entire pipeline is created.
+- GitLab's CI Lint/Validate tool should be used before relying on the change.
+
+ACCEPTABLE VARIATIONS
+- A logically equivalent set of properly ordered workflow rules is correct.
+- Do not require artifacts, cache configuration, or deployment in this exercise.
+- If the candidate says dotnet test may rebuild in its separate job, that is a
+  good observation and not an error.`
+    },
+
     'csharp-unique-claims': {
       title: 'C# OOP — Remove Duplicate Claims',
       language: 'csharp',
@@ -1063,7 +1146,7 @@ padding is inside the element's border; margin is outside the border.`
       language: 'markdown',
       content: `# Welcome to your .NET interview
 
-You will work through ten short exercises. Each one is intended to take about
+You will work through eleven short exercises. Each one is intended to take about
 five minutes. The goal is to understand how you approach a problem—not to test
 whether you have memorized every piece of syntax.
 
@@ -1078,7 +1161,8 @@ whether you have memorized every piece of syntax.
 7. C# — REST API Basics
 8. AI — Prompt a Coding Assistant
 9. HTML/CSS — Responsive Policy Card
-10. C# — Remove Duplicate Claim IDs
+10. GitLab CI — Fix and Validate a .NET Pipeline
+11. C# — Remove Duplicate Claims
 
 ## How to approach each exercise
 
@@ -1094,11 +1178,11 @@ reasoning, honest communication, and learning from a hint are all valuable.`,
       answerKey: `OVERALL GRADING
 Each exercise has a 0–3 score in its own Answer Key.
 
-Suggested total for 10 questions: 30 points
-27–30 — Strong performance
-20–26 — Reasonable performance; discuss weak areas
-12–19 — Significant gaps; consider experience claims carefully
-0–11  — Fundamentals were not demonstrated
+Suggested total for 11 questions: 34 points
+30–34 — Strong performance
+23–29 — Reasonable performance; discuss weak areas
+14–22 — Significant gaps; consider experience claims carefully
+0–13  — Fundamentals were not demonstrated
 
 This is only a guide. Communication, honesty, response to hints, and ability
 to explain their own resume should influence the final decision.
