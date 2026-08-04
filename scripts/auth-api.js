@@ -86,7 +86,9 @@ const Auth = (function() {
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.error || `HTTP ${response.status}`);
+        const error = new Error(data.error || `HTTP ${response.status}`);
+        error.status = response.status;
+        throw error;
       }
       
       return data;
@@ -127,9 +129,31 @@ const Auth = (function() {
       return { success: false, error: data.error || 'Authentication failed' };
     } catch (error) {
       console.error('API login error:', error);
+
+      if (error.status === 401) {
+        return {
+          success: false,
+          error: 'Invalid email or password. Confirm that this email is listed as an admin and that the password was entered exactly as provided.'
+        };
+      }
+
+      if (error.status === 403) {
+        return {
+          success: false,
+          error: error.message || 'This account does not have interviewer access.'
+        };
+      }
+
+      if (error.status) {
+        return {
+          success: false,
+          error: `Login failed: ${error.message || `HTTP ${error.status}`}`
+        };
+      }
+
       return { 
         success: false, 
-        error: 'Server connection failed. Please check if the API is running.'
+        error: 'Could not reach the login service. Check the internet connection and try again.'
       };
     }
   }
