@@ -25,6 +25,8 @@ function emailKey(email) {
 // Admin credentials (use environment variables in production)
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
+const INTERVIEWER_USERNAME = process.env.INTERVIEWER_USERNAME;
+const INTERVIEWER_PASSWORD_HASH = process.env.INTERVIEWER_PASSWORD_HASH;
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // Ensure required environment variables are set
@@ -78,9 +80,15 @@ module.exports = async (req, res) => {
       : '';
     const ownerLogin = Boolean(normalizedOwnerEmail) &&
       normalizedEmail === normalizedOwnerEmail;
-    let passwordHash = ownerLogin ? ADMIN_PASSWORD_HASH : null;
+    const configuredInterviewerLogin = Boolean(INTERVIEWER_USERNAME) &&
+      normalizedEmail === String(INTERVIEWER_USERNAME).trim().toLowerCase();
+    let passwordHash = ownerLogin
+      ? ADMIN_PASSWORD_HASH
+      : configuredInterviewerLogin
+        ? INTERVIEWER_PASSWORD_HASH
+        : null;
 
-    if (!ownerLogin && admin.apps.length) {
+    if (!ownerLogin && !configuredInterviewerLogin && admin.apps.length) {
       const snapshot = await admin.database()
         .ref(`adminAccounts/${emailKey(normalizedEmail)}`)
         .once('value');
