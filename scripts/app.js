@@ -51,6 +51,17 @@
       candidateBtn.addEventListener('click', function() {
         document.getElementById('landingModal').style.display = 'none';
         document.getElementById('candidateModal').style.display = 'flex';
+
+        // Temporary one-click entry for today's Safari candidate.
+        const nameInput = document.getElementById('candidateName');
+        const codeInput = document.getElementById('candidateSessionCode');
+        const consentInput = document.getElementById('candidatePrivacyConsent');
+        const joinButton = document.getElementById('candidateJoinBtn');
+        nameInput.value = 'Sai Nikhil';
+        codeInput.value = emergencyCandidateSessionCode;
+        consentInput.checked = true;
+        joinButton.disabled = false;
+        joinButton.click();
       });
     }
 
