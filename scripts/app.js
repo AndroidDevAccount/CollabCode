@@ -161,7 +161,17 @@
     const adminPassword = document.getElementById('adminPassword');
     const adminLoginBtn = document.getElementById('adminLoginBtn');
     const adminLoginBack = document.getElementById('adminLoginBack');
+    const toggleAdminPassword = document.getElementById('toggleAdminPassword');
     const loginError = document.getElementById('loginError');
+
+    toggleAdminPassword.addEventListener('click', function() {
+      const showing = adminPassword.type === 'text';
+      adminPassword.type = showing ? 'password' : 'text';
+      this.textContent = showing ? 'Show' : 'Hide';
+      this.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+      this.setAttribute('aria-pressed', String(!showing));
+      adminPassword.focus();
+    });
 
     // Back button
     adminLoginBack.addEventListener('click', function() {

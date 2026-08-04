@@ -22,7 +22,7 @@
 
     <!-- styling -->
     <!-- Custom style -->
-    <link rel="stylesheet" href="styles/main.css?v=15">
+    <link rel="stylesheet" href="styles/main.css?v=16">
     <!-- Firepad -->
     <link rel="stylesheet" href="https://cdn.firebase.com/libs/firepad/1.4.0/firepad.css" />
 
@@ -213,7 +213,11 @@
         
         <div class="form-group">
           <label>Password</label>
-          <input type="password" id="adminPassword" placeholder="Enter your password">
+          <div class="password-input-row">
+            <input type="password" id="adminPassword" placeholder="Enter your password">
+            <button type="button" id="toggleAdminPassword" class="password-toggle"
+              aria-label="Show password" aria-pressed="false">Show</button>
+          </div>
         </div>
         
         <button id="adminLoginBtn" class="primary-btn">Login</button>
@@ -763,6 +767,6 @@
     <script src="scripts/posthog-tracking.js?v=2"></script>
     <script src="scripts/session-tracking.js?v=1"></script>
     <script src="scripts/activity-monitor.js?v=7"></script>
-    <script src="scripts/app.js?v=10"></script>
+    <script src="scripts/app.js?v=11"></script>
   </body>
 </html>

@@ -285,6 +285,34 @@ html, body {
   border-color: #007acc;
 }
 
+.password-input-row {
+  position: relative;
+}
+
+.password-input-row input {
+  padding-right: 68px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 4px;
+  background: #3a3a3a;
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.password-toggle:hover,
+.password-toggle:focus-visible {
+  background: #4a4a4a;
+  outline: 2px solid #007acc;
+}
+
 .form-group small {
   display: block;
   margin-top: 5px;
