@@ -589,50 +589,20 @@ Accept either the dotnet CLI or Package Manager Console command style.`
     },
 
     'gitlab-yaml': {
-      title: 'GitLab CI — Fix and Validate a .NET Pipeline',
+      title: 'GitLab CI — Add YAML Validation',
       language: 'yaml',
       content: `# 5-minute GitLab CI YAML question
 #
-# This pipeline is supposed to build and test a .NET application, but GitLab
-# rejects it because the test job uses a stage that has not been declared.
-# It also runs for every branch, while the team only wants pipelines for:
-# - merge requests
-# - the main branch
+# This .NET project stores YAML configuration files in the config folder.
+# The team has already provided this command to validate them:
+#
+#     validate-yaml config/
 #
 # YOUR TASK
-# 1. Add the missing test stage after build.
-# 2. Keep build_app in the build stage and test_app in the test stage.
-# 3. Add workflow rules so the pipeline runs for merge requests or main.
-# 4. Keep the existing dotnet commands.
-
-image: mcr.microsoft.com/dotnet/sdk:8.0
-
-stages:
-  - build
-
-build_app:
-  stage: build
-  script:
-    - dotnet restore
-    - dotnet build --no-restore
-
-test_app:
-  stage: test
-  script:
-    - dotnet test
-`,
-      answerKey: `WHAT IS WRONG?
-The test_app job says stage: test, but stages declares only build. GitLab's CI
-validator rejects a job whose stage is not in the stages list.
-
-ONE GOOD SOLUTION
-image: mcr.microsoft.com/dotnet/sdk:8.0
-
-workflow:
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == "main"'
-    - when: never
+# 1. Add a validate stage before build.
+# 2. Add a validate_yaml job in that stage.
+# 3. Run the provided validation command in that job.
+# 4. Do not change the existing build and test jobs.
 
 stages:
   - build
@@ -641,8 +611,33 @@ stages:
 build_app:
   stage: build
   script:
-    - dotnet restore
-    - dotnet build --no-restore
+    - dotnet build
+
+test_app:
+  stage: test
+  script:
+    - dotnet test
+`,
+      answerKey: `PLAIN-ENGLISH ANSWER
+Add validate as the first stage, then add a job assigned to that stage. Put the
+provided validation command under the job's script list. GitLab runs stages in
+the order listed, so validation happens before build and test.
+
+ONE GOOD SOLUTION
+stages:
+  - validate
+  - build
+  - test
+
+validate_yaml:
+  stage: validate
+  script:
+    - validate-yaml config/
+
+build_app:
+  stage: build
+  script:
+    - dotnet build
 
 test_app:
   stage: test
@@ -650,25 +645,23 @@ test_app:
     - dotnet test
 
 HOW TO GRADE (0-4)
-4 — Declares test after build, keeps both jobs in the right stages, and writes
-    valid workflow rules for merge requests and main.
-3 — Corrects the stages and jobs but needs a small hint on one workflow rule.
-2 — Identifies the missing test stage and fixes it, but cannot restrict when the
-    pipeline is created.
-1 — Understands that the stage names must match but produces invalid YAML.
-0 — Cannot identify why GitLab rejects the pipeline.
+4 — Adds validate before build, creates the job in that stage, runs the supplied
+    command, and leaves the existing jobs unchanged.
+3 — Correct structure with one small indentation, naming, or ordering mistake.
+2 — Adds either the stage or the job correctly but needs help connecting them.
+1 — Understands that validation should run first but produces invalid YAML.
+0 — Cannot add a stage and job to the pipeline.
 
 WHAT TO LISTEN FOR
 - YAML indentation is meaningful; tabs should not be used.
-- stages controls job order: all build jobs finish before test jobs start.
-- workflow: rules controls whether the entire pipeline is created.
-- GitLab's CI Lint/Validate tool should be used before relying on the change.
+- The stage name on validate_yaml must match a name in stages.
+- Stage order makes validation run before build.
+- If validation exits with an error, GitLab normally stops later stages.
 
 ACCEPTABLE VARIATIONS
-- A logically equivalent set of properly ordered workflow rules is correct.
-- Do not require artifacts, cache configuration, or deployment in this exercise.
-- If the candidate says dotnet test may rebuild in its separate job, that is a
-  good observation and not an error.`
+- The validation job's name can be different.
+- Do not expect the candidate to invent or explain the supplied command.
+- Do not require workflow rules, artifacts, caching, or deployment.`
     },
 
     'csharp-unique-claims': {
